@@ -32,11 +32,14 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     private bool isBusy;
     private double transferProgress;
     private uint storedBytes;
+    private TypingWorkload typingWorkload;
+    private bool hasTypingEstimate;
 
     public MainWindowViewModel(Func<Task<string?>> readClipboard)
     {
         this.readClipboard = readClipboard;
         assessment = TextCapacity.Assess(string.Empty, false);
+        UpdateTypingEstimate();
         PasteClipboardCommand = new AsyncRelayCommand(PasteClipboardAsync, () => !IsBusy);
         SplitCommand = new RelayCommand(SplitText, () => NeedsSplit && !HasBlockingUnsupported);
         SendCommand = new AsyncRelayCommand(SendSelectedAsync, () => CanSend);
@@ -175,6 +178,21 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     public bool HasParts => Parts.Count > 0;
     public bool ShowProgress => IsBusy && TransferProgress > 0;
 
+    public string TypingEstimateHint => !assessment.HasText
+        ? "Text eingeben, um die Tippdauer zu berechnen."
+        : HasBlockingUnsupported
+            ? "Die Dauer ist nach Ersetzen oder Entfernen unbekannter Zeichen verfügbar."
+            : $"{typingWorkload.StrokeCount:N0} Tastenfolgen · AltGr-Zeiten eingerechnet";
+
+    public string Duration5 => EstimateAt(5);
+    public string Duration25 => EstimateAt(25);
+    public string Duration50 => EstimateAt(50);
+    public string Duration100 => EstimateAt(100);
+    public string Duration250 => EstimateAt(250);
+    public string Duration500 => EstimateAt(500);
+    public string Duration750 => EstimateAt(750);
+    public string Duration1000 => EstimateAt(1000);
+
     public string UnsupportedText
     {
         get
@@ -218,6 +236,7 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     private void Reassess(bool clearParts)
     {
         assessment = TextCapacity.Assess(Text, ReplaceUnsupported);
+        UpdateTypingEstimate();
         if (clearParts)
         {
             Parts.Clear();
@@ -243,8 +262,29 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         OnPropertyChanged(nameof(UnsupportedText));
         OnPropertyChanged(nameof(SplitSummary));
         OnPropertyChanged(nameof(SendButtonText));
+        OnPropertyChanged(nameof(TypingEstimateHint));
+        OnPropertyChanged(nameof(Duration5));
+        OnPropertyChanged(nameof(Duration25));
+        OnPropertyChanged(nameof(Duration50));
+        OnPropertyChanged(nameof(Duration100));
+        OnPropertyChanged(nameof(Duration250));
+        OnPropertyChanged(nameof(Duration500));
+        OnPropertyChanged(nameof(Duration750));
+        OnPropertyChanged(nameof(Duration1000));
         NotifyCommands();
     }
+
+    private void UpdateTypingEstimate()
+    {
+        hasTypingEstimate = assessment.HasText && !assessment.HasBlockingUnsupported;
+        typingWorkload = hasTypingEstimate
+            ? TypingDurationEstimator.Analyze(assessment.Analysis.Text)
+            : default;
+    }
+
+    private string EstimateAt(int delayMilliseconds) => hasTypingEstimate
+        ? TypingDurationEstimator.Format(typingWorkload.Estimate(delayMilliseconds))
+        : "—";
 
     private void SplitText()
     {

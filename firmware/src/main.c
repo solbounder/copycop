@@ -17,7 +17,6 @@ _Static_assert(PICO_FLASH_SIZE_BYTES == COPYCOP_FLASH_SIZE_BYTES,
                "Pico SDK board flash size does not match board_config.h");
 
 static const copycop_rgb_t TARGET_BOOT_COLOR = {0u, 48u, 0u};
-static const copycop_rgb_t VDI_BOOT_COLOR = {0u, 32u, 40u};
 static const copycop_rgb_t LOAD_BOOT_COLOR = {0u, 0u, 48u};
 static const copycop_rgb_t AFK_BOOT_COLOR = {32u, 0u, 40u};
 static const copycop_rgb_t TARGET_IDLE_COLOR = {0u, 5u, 0u};
@@ -73,7 +72,6 @@ int main(void) {
     const unsigned int boot_buttons = buttons_boot_pressed_mask();
     const unsigned int all_buttons = (1u << COPYCOP_BUTTON_COUNT) - 1u;
     const unsigned int left_button = 1u << COPYCOP_BUTTON_LEFT;
-    const unsigned int right_button = 1u << COPYCOP_BUTTON_RIGHT;
 
     if (boot_buttons == all_buttons) {
         status_led_init();
@@ -86,7 +84,6 @@ int main(void) {
     }
 
     copycop_app_mode_t mode = COPYCOP_MODE_TARGET;
-    const bool vdi_altgr_compatibility = boot_buttons == right_button;
     if (boot_buttons == left_button) {
         mode = COPYCOP_MODE_AFK;
     } else if ((boot_buttons & (1u << COPYCOP_BUTTON_MIDDLE)) != 0u) {
@@ -99,8 +96,6 @@ int main(void) {
         boot_color = LOAD_BOOT_COLOR;
     } else if (mode == COPYCOP_MODE_AFK) {
         boot_color = AFK_BOOT_COLOR;
-    } else if (vdi_altgr_compatibility) {
-        boot_color = VDI_BOOT_COLOR;
     }
 
     status_led_show_solid(boot_color);
@@ -110,7 +105,7 @@ int main(void) {
 
     storage_init();
     copycop_usb_init(mode);
-    typer_init(vdi_altgr_compatibility);
+    typer_init();
     protocol_init();
 
     unsigned int speed_index = storage_load_speed_index();
@@ -126,6 +121,7 @@ int main(void) {
     bool afk_repeat_enabled = false;
     bool afk_one_shot_pending = false;
     bool afk_repeat_waiting = false;
+    bool speed_save_pending = false;
     absolute_time_t afk_next_repeat = nil_time;
 
     copycop_rgb_t displayed = select_display_color(mode, false, color_override);
@@ -160,27 +156,51 @@ int main(void) {
                     }
                 }
             }
-            if (pressed_edges[COPYCOP_BUTTON_LEFT] && !typer_is_active()) {
+            if (pressed_edges[COPYCOP_BUTTON_LEFT]) {
                 const unsigned int next_index = speed_index + 1u
                     < COPYCOP_SPEED_LEVEL_COUNT ? speed_index + 1u : speed_index;
-                const bool saved = next_index == speed_index
-                    || storage_save_speed_index((uint8_t)next_index);
-                if (saved) speed_index = next_index;
+                bool saved = true;
+                if (next_index != speed_index) {
+                    if (typer_is_active()) {
+                        speed_index = next_index;
+                        typer_set_delay_ms(SPEED_LEVELS_MS[speed_index]);
+                        speed_save_pending = true;
+                    } else {
+                        saved = storage_save_speed_index((uint8_t)next_index);
+                        if (saved) speed_index = next_index;
+                    }
+                }
                 color_override = saved ? SPEED_COLORS[speed_index] : ERROR_COLOR;
                 color_override_until = make_timeout_time_ms(350u);
                 color_override_active = true;
             }
-            if (pressed_edges[COPYCOP_BUTTON_MIDDLE] && !typer_is_active()) {
+            if (pressed_edges[COPYCOP_BUTTON_MIDDLE]) {
                 const unsigned int next_index = speed_index > 0u
                     ? speed_index - 1u : speed_index;
-                const bool saved = next_index == speed_index
-                    || storage_save_speed_index((uint8_t)next_index);
-                if (saved) speed_index = next_index;
+                bool saved = true;
+                if (next_index != speed_index) {
+                    if (typer_is_active()) {
+                        speed_index = next_index;
+                        typer_set_delay_ms(SPEED_LEVELS_MS[speed_index]);
+                        speed_save_pending = true;
+                    } else {
+                        saved = storage_save_speed_index((uint8_t)next_index);
+                        if (saved) speed_index = next_index;
+                    }
+                }
                 color_override = saved ? SPEED_COLORS[speed_index] : ERROR_COLOR;
                 color_override_until = make_timeout_time_ms(350u);
                 color_override_active = true;
             }
             typer_task();
+            if (speed_save_pending && !typer_is_active()) {
+                speed_save_pending = false;
+                if (!storage_save_speed_index((uint8_t)speed_index)) {
+                    color_override = ERROR_COLOR;
+                    color_override_until = make_timeout_time_ms(600u);
+                    color_override_active = true;
+                }
+            }
         } else if (mode == COPYCOP_MODE_LOAD) {
             if (pressed_edges[COPYCOP_BUTTON_MIDDLE]) {
                 protocol_notify_copy_pressed();

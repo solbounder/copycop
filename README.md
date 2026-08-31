@@ -24,14 +24,15 @@ Kapazität und nicht unterstützte Zeichen und blockiert einen zu großen
 Transfer. Ein übergroßer Text kann Unicode-sicher an Zeilen- oder Wortgrenzen
 aufgeteilt werden. Das Gerät speichert weiterhin **einen ausgewählten Teil zur
 Zeit**; die übrigen Teile bleiben in der App und können später einzeln geladen
-werden. Nichts wird still abgeschnitten.
+werden. Nichts wird still abgeschnitten. Für den aktuellen Text zeigt die GUI
+außerdem die geschätzte Tippdauer bei allen acht Geschwindigkeitsstufen an.
 
 ## Die drei Tasten
 
 | Taste | Normalbetrieb | LOAD-Modus | AFK-Modus |
 |---|---|---|---|
-| links (`Ctrl`) | langsamer | ohne Funktion | zusammen mit C: genau einmal tippen |
-| Mitte (`C`) | schneller | Zwischenablage übernehmen und speichern | Endloswiederholung starten |
+| links (`Ctrl`) | langsamer, auch während der Ausgabe | ohne Funktion | zusammen mit C: genau einmal tippen |
+| Mitte (`C`) | schneller, auch während der Ausgabe | Zwischenablage übernehmen und speichern | Endloswiederholung starten |
 | rechts (`V`) | Text tippen; erneut drücken = abbrechen | ohne Funktion | Wiederholung sofort stoppen |
 
 Die Beschriftungen `Ctrl`, `C` und `V` beschreiben nur die Tastenkappen. Es
@@ -43,7 +44,6 @@ Beim Einstecken wählt eine gehaltene Gerätetaste den Modus:
 - keine Taste: grüner Normalbetrieb,
 - nur die linke Strg-Taste: violetter AFK-Modus,
 - mittlere C-Taste: blauer LOAD-Modus,
-- nur die rechte V-Taste: türkiser VDI-/Remote-Desktop-Modus,
 - alle drei Tasten: weißer Firmware-Update-Modus.
 
 ## Programme
@@ -105,9 +105,8 @@ benötigt.
 4. Text in der GUI einfügen und auf „speichern“ klicken – oder Text normal
    kopieren und am Gerät C drücken.
 5. Nach der grünen Bestätigung abziehen.
-6. Am normalen Ziel-PC ohne gedrückte Taste einstecken. Bei einer VDI-/RDP-
-   Sitzung stattdessen V halten, CopyCop einstecken und nach der türkisen
-   Startanzeige loslassen. In beiden Fällen deutsches Tastaturlayout auswählen.
+6. Am Ziel-PC ohne gedrückte Taste einstecken und deutsches Tastaturlayout
+   auswählen.
 7. Cursor platzieren und rechts V drücken. Ein zweites V bricht sofort ab.
 
 Im TARGET-Modus besitzt CopyCop genau eine USB-Schnittstelle: eine
@@ -120,17 +119,23 @@ Programm und keinen zusätzlichen Treiber.
 Im Normalbetrieb stehen `5, 25, 50, 100, 250, 500, 750, 1000 ms` zur Auswahl;
 `5 ms` ist die Werkseinstellung. C macht schneller, Strg macht langsamer. An
 der schnellsten beziehungsweise langsamsten Grenze bleibt die Einstellung
-stehen. Die Auswahl bleibt nach dem Abziehen erhalten.
+stehen. Beide Tasten können auch während des Tippens verwendet werden; die
+neue Stufe gilt ab dem nächsten Zeichenabstand und wird nach Ende oder Abbruch
+der Ausgabe dauerhaft gespeichert. Die Auswahl bleibt nach dem Abziehen
+erhalten.
 
-### VDI- und Remote-Desktop-Ziele
+Die Tippdauer in der GUI berücksichtigt pro HID-Tastenfolge die gewählte Pause,
+die Haltezeit und die längere gestaffelte Ausgabe von AltGr-Zeichen. Sie ist
+eine sehr genaue Schätzung; Betriebssystem, USB-Weiterleitung und Zielprogramm
+können noch geringe zusätzliche Verzögerungen verursachen.
 
-Manche VDI-, RDP- oder Browser-Remote-Sitzungen verschlucken den nativen
-rechten Alt-/AltGr-Modifier. Typische Symptome sind `{` als `7`, `}` als `0`
-und `|` als `<`, obwohl der Text korrekt gespeichert wurde. Der mit V beim
-Einstecken gewählte VDI-Modus sendet AltGr-Zeichen deshalb kompatibel als
-`Ctrl+Alt`. CopyCop bleibt dabei weiterhin ausschließlich eine USB-Tastatur.
-Die türkise Farbe erscheint nur kurz beim Start; danach leuchtet das Gerät wie
-im normalen Zielmodus schwach grün.
+### AltGr-Zeichen
+
+Der normale Zielmodus bildet AltGr-Zeichen wie `{`, `}`, `|`, `@`, `€`, `[` und
+`]` als physischen Tastendruck nach: echtes rechtes Alt wird zuerst gedrückt,
+dann folgt mit Abstand das Zeichen, anschließend werden Zeichen und AltGr
+getrennt losgelassen. Das verhindert, dass kurze USB-Berichte den Modifier
+verlieren. Ein zusätzlicher Zielmodus ist dafür nicht nötig.
 
 ## AFK-Modus
 

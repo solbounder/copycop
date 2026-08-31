@@ -4,12 +4,10 @@
 
 #include "class/hid/hid.h"
 
-#define MOD_SHIFT        KEYBOARD_MODIFIER_LEFTSHIFT
-#define MOD_ALTGR_NATIVE KEYBOARD_MODIFIER_RIGHTALT
-#define MOD_ALTGR_VDI    (KEYBOARD_MODIFIER_LEFTCTRL | KEYBOARD_MODIFIER_LEFTALT)
+#define MOD_SHIFT KEYBOARD_MODIFIER_LEFTSHIFT
+#define MOD_ALTGR KEYBOARD_MODIFIER_RIGHTALT
 
-_Static_assert(MOD_ALTGR_NATIVE == 0x40u, "native AltGr must be HID right Alt");
-_Static_assert(MOD_ALTGR_VDI == 0x05u, "VDI AltGr must be HID left Ctrl+Alt");
+_Static_assert(MOD_ALTGR == 0x40u, "AltGr must be HID right Alt");
 
 static void one(copycop_key_sequence_t *sequence, uint8_t modifiers, uint8_t keycode) {
     sequence->strokes[0] = (copycop_key_stroke_t){modifiers, keycode};
@@ -22,8 +20,7 @@ static void dead_key(copycop_key_sequence_t *sequence, uint8_t modifiers, uint8_
     sequence->count = 2u;
 }
 
-bool keyboard_layout_de_map(uint32_t codepoint, bool altgr_compatibility,
-                            copycop_key_sequence_t *sequence) {
+bool keyboard_layout_de_map(uint32_t codepoint, copycop_key_sequence_t *sequence) {
     if (sequence == NULL) {
         return false;
     }
@@ -48,8 +45,6 @@ bool keyboard_layout_de_map(uint32_t codepoint, bool altgr_compatibility,
         return true;
     }
 
-    const uint8_t altgr = altgr_compatibility ? MOD_ALTGR_VDI : MOD_ALTGR_NATIVE;
-
     switch (codepoint) {
         case '0': one(sequence, 0u, HID_KEY_0); break;
         case ' ': one(sequence, 0u, HID_KEY_SPACE); break;
@@ -70,7 +65,7 @@ bool keyboard_layout_de_map(uint32_t codepoint, bool altgr_compatibility,
         case 0x00B4u: dead_key(sequence, 0u, HID_KEY_EQUAL); break; /* acute */
         case '+': one(sequence, 0u, HID_KEY_BRACKET_RIGHT); break;
         case '*': one(sequence, MOD_SHIFT, HID_KEY_BRACKET_RIGHT); break;
-        case '~': dead_key(sequence, altgr, HID_KEY_BRACKET_RIGHT); break;
+        case '~': dead_key(sequence, MOD_ALTGR, HID_KEY_BRACKET_RIGHT); break;
         case '#': one(sequence, 0u, HID_KEY_BACKSLASH); break;
         case '\'': one(sequence, MOD_SHIFT, HID_KEY_BACKSLASH); break;
         case '-': one(sequence, 0u, HID_KEY_SLASH); break;
@@ -81,14 +76,14 @@ bool keyboard_layout_de_map(uint32_t codepoint, bool altgr_compatibility,
         case ';': one(sequence, MOD_SHIFT, HID_KEY_COMMA); break;
         case '<': one(sequence, 0u, HID_KEY_EUROPE_2); break;
         case '>': one(sequence, MOD_SHIFT, HID_KEY_EUROPE_2); break;
-        case '|': one(sequence, altgr, HID_KEY_EUROPE_2); break;
-        case '@': one(sequence, altgr, HID_KEY_Q); break;
-        case 0x20ACu: one(sequence, altgr, HID_KEY_E); break; /* euro */
-        case '[': one(sequence, altgr, HID_KEY_8); break;
-        case ']': one(sequence, altgr, HID_KEY_9); break;
-        case '{': one(sequence, altgr, HID_KEY_7); break;
-        case '}': one(sequence, altgr, HID_KEY_0); break;
-        case '\\': one(sequence, altgr, HID_KEY_MINUS); break;
+        case '|': one(sequence, MOD_ALTGR, HID_KEY_EUROPE_2); break;
+        case '@': one(sequence, MOD_ALTGR, HID_KEY_Q); break;
+        case 0x20ACu: one(sequence, MOD_ALTGR, HID_KEY_E); break; /* euro */
+        case '[': one(sequence, MOD_ALTGR, HID_KEY_8); break;
+        case ']': one(sequence, MOD_ALTGR, HID_KEY_9); break;
+        case '{': one(sequence, MOD_ALTGR, HID_KEY_7); break;
+        case '}': one(sequence, MOD_ALTGR, HID_KEY_0); break;
+        case '\\': one(sequence, MOD_ALTGR, HID_KEY_MINUS); break;
         case 0x00E4u: one(sequence, 0u, HID_KEY_APOSTROPHE); break;
         case 0x00F6u: one(sequence, 0u, HID_KEY_SEMICOLON); break;
         case 0x00FCu: one(sequence, 0u, HID_KEY_BRACKET_LEFT); break;

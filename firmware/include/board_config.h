@@ -71,6 +71,8 @@
 #define COPYCOP_SPEED_LEVEL_COUNT         8u
 #define COPYCOP_DEFAULT_SPEED_INDEX       0u
 #define COPYCOP_KEY_HOLD_MS               1u
+#define COPYCOP_ALTGR_SETTLE_MS           35u
+#define COPYCOP_ALTGR_KEY_HOLD_MS         15u
 
 #if COPYCOP_BOOT_PRESSED_THRESHOLD > COPYCOP_BOOT_SAMPLE_COUNT
 #error "Boot pressed threshold cannot exceed the sample count"

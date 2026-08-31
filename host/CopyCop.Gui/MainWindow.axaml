@@ -171,6 +171,44 @@
             </StackPanel>
           </Border>
 
+          <Border Classes="softCard">
+            <StackPanel Spacing="7">
+              <TextBlock Text="GESCHÄTZTE TIPPDAUER" Classes="eyebrow" />
+              <TextBlock Text="{Binding TypingEstimateHint}" Classes="muted"
+                         FontSize="11" TextWrapping="Wrap" />
+              <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,*"
+                    RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="7" RowSpacing="5">
+                <Border Width="10" Height="10" CornerRadius="5" Background="#36D7D9" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="5 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Column="2" Text="{Binding Duration5}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+                <Border Grid.Column="3" Width="10" Height="10" CornerRadius="5" Background="#36D98B" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="4" Text="25 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Column="5" Text="{Binding Duration25}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+
+                <Border Grid.Row="1" Width="10" Height="10" CornerRadius="5" Background="#63E66F" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="50 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Duration50}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+                <Border Grid.Row="1" Grid.Column="3" Width="10" Height="10" CornerRadius="5" Background="#B8E64B" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="1" Grid.Column="4" Text="100 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Row="1" Grid.Column="5" Text="{Binding Duration100}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+
+                <Border Grid.Row="2" Width="10" Height="10" CornerRadius="5" Background="#E8D34E" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="250 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Duration250}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+                <Border Grid.Row="2" Grid.Column="3" Width="10" Height="10" CornerRadius="5" Background="#F2A640" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="2" Grid.Column="4" Text="500 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Row="2" Grid.Column="5" Text="{Binding Duration500}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+
+                <Border Grid.Row="3" Width="10" Height="10" CornerRadius="5" Background="#F06B3D" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="750 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding Duration750}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+                <Border Grid.Row="3" Grid.Column="3" Width="10" Height="10" CornerRadius="5" Background="#E84E57" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="3" Grid.Column="4" Text="1000 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Row="3" Grid.Column="5" Text="{Binding Duration1000}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
           <Border Classes="softCard" IsVisible="{Binding NeedsSplit}">
             <StackPanel Spacing="11">
               <TextBlock Text="TEXT AUFTEILEN" Classes="eyebrow" />
@@ -221,13 +259,6 @@
                       </StackPanel>
                     </Grid>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                      <Border Classes="keycap"><TextBlock Text="V" FontSize="11" FontWeight="SemiBold" TextAlignment="Center" /></Border>
-                      <StackPanel Grid.Column="1" Spacing="1">
-                        <TextBlock Text="VDI-/Remote-Desktop-Ziel" Classes="sectionTitle" />
-                        <TextBlock Text="V halten · kurz türkis, dann grün · AltGr-kompatibel" Classes="muted" FontSize="11" />
-                      </StackPanel>
-                    </Grid>
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
                       <Border Classes="keycap"><TextBlock Text="alle 3" FontSize="11" FontWeight="SemiBold" TextAlignment="Center" /></Border>
                       <StackPanel Grid.Column="1" Spacing="1">
                         <TextBlock Text="Firmware-Update" Classes="sectionTitle" />
@@ -243,9 +274,9 @@
                     <TextBlock Text="Normalmodus · grün" Classes="sectionTitle" />
                     <Grid ColumnDefinitions="60,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="7">
                       <TextBlock Text="Strg" FontWeight="SemiBold" />
-                      <TextBlock Grid.Column="1" Text="langsamer" Classes="muted" />
+                      <TextBlock Grid.Column="1" Text="langsamer · auch beim Tippen" Classes="muted" />
                       <TextBlock Grid.Row="1" Text="C" FontWeight="SemiBold" />
-                      <TextBlock Grid.Row="1" Grid.Column="1" Text="schneller" Classes="muted" />
+                      <TextBlock Grid.Row="1" Grid.Column="1" Text="schneller · auch beim Tippen" Classes="muted" />
                       <TextBlock Grid.Row="2" Text="V" FontWeight="SemiBold" />
                       <TextBlock Grid.Row="2" Grid.Column="1" Text="Text tippen · erneut drücken = Stopp" Classes="muted" TextWrapping="Wrap" />
                     </Grid>
@@ -270,7 +301,7 @@
 
                     <TextBlock Text="Gemeint sind immer die drei Tasten auf CopyCop. C oder V auf dem Laptop lösen nichts aus."
                                Classes="muted" FontSize="11" TextWrapping="Wrap" LineHeight="16" />
-                    <TextBlock Text="Wenn in einer VDI { zu 7, } zu 0 oder | zu &lt; wird: CopyCop abziehen und beim Einstecken V halten."
+                    <TextBlock Text="AltGr-Zeichen werden automatisch mit einem realistischen Tastentiming ausgegeben."
                                Classes="muted" FontSize="11" TextWrapping="Wrap" LineHeight="16" />
                   </StackPanel>
                 </Border>

@@ -51,6 +51,24 @@ Check(GermanLayout.TryMap(new Rune('~'), out var tilde) && tilde.Strokes.Length 
 Check(GermanLayout.TryMap(new Rune('ä'), out _), "umlaut");
 Check(Encoding.UTF8.GetByteCount(new string('ä', 63_232)) == 126_464, "maximum UTF-8 byte boundary");
 
+var simpleWorkload = TypingDurationEstimator.Analyze("a");
+Check(simpleWorkload.StrokeCount == 1 && simpleWorkload.AltGrStrokeCount == 0,
+    "typing workload regular key");
+Check(simpleWorkload.Estimate(5) == TimeSpan.FromMilliseconds(6),
+    "typing duration regular key");
+var altGrWorkload = TypingDurationEstimator.Analyze("{");
+Check(altGrWorkload.StrokeCount == 1 && altGrWorkload.AltGrStrokeCount == 1,
+    "typing workload AltGr");
+Check(altGrWorkload.Estimate(5) == TimeSpan.FromMilliseconds(90),
+    "typing duration staged AltGr");
+var deadAltGrWorkload = TypingDurationEstimator.Analyze("~");
+Check(deadAltGrWorkload.StrokeCount == 2 && deadAltGrWorkload.AltGrStrokeCount == 1
+      && deadAltGrWorkload.Estimate(5) == TimeSpan.FromMilliseconds(96),
+    "typing duration AltGr dead key");
+Check(TypingDurationEstimator.SpeedLevelsMilliseconds.SequenceEqual(
+        new[] { 5, 25, 50, 100, 250, 500, 750, 1000 }),
+    "typing duration speed levels");
+
 var asciiAtLimit = TextCapacity.Assess(new string('x', TextCapacity.FirmwareMaximumBytes), false);
 Check(asciiAtLimit.CanTransfer && asciiAtLimit.RequiredParts == 1, "ASCII exact capacity");
 

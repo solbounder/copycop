@@ -11,7 +11,6 @@ dass Windows zwischengespeicherte USB-Deskriptoren des anderen Modus verwendet.
 | keine Taste | genau ein Boot-Keyboard-HID | `CAFE:4030` | grün |
 | nur linke Taste gehalten | genau ein Boot-Keyboard-HID | `CAFE:4030` | violett |
 | mittlere Taste gehalten | genau ein Generic-IN/OUT-HID | `CAFE:4031` | blau |
-| nur rechte Taste gehalten | genau ein Boot-Keyboard-HID, AltGr als `Ctrl+Alt` | `CAFE:4030` | kurz türkis, dann grün |
 | alle drei Tasten gehalten | RP2040-ROM-Update-Laufwerk | ROM | weiß |
 
 `0xCAFE` ist eine Prototyp-VID und nicht für eine öffentliche Produktverteilung
@@ -23,12 +22,11 @@ keine Vendor-Konfiguration. LOAD enthält absichtlich kein Keyboard. Deshalb
 kann der Lade-PC während einer Übertragung keine Tastatureingaben vom Gerät
 erhalten.
 
-Der VDI-Zielmodus besitzt denselben USB-Deskriptor wie TARGET. Er verändert nur
-die Tastenkombination für Zeichen der dritten deutschen Belegungsebene: Weil
-einige Remote-Sitzungen Right-Alt verwerfen, werden diese Zeichen dort mit dem
-unter Windows gleichwertigen `Ctrl+Alt` erzeugt. Der Modus wird ausschließlich
-durch die rechte Gerätetaste beim Einstecken gewählt und ist daher nicht
-versehentlich aus der Ferne aktivierbar.
+TARGET und AFK staffeln echtes HID Right-Alt automatisch: Modifier-only, 35 ms
+Einschwingzeit, Modifier plus Taste, 15 ms Haltezeit, Taste loslassen, 35 ms und
+erst dann den Modifier loslassen. Das entspricht einem physischen AltGr-
+Tastendruck besser als ein gemeinsamer Ein-Millisekunden-Bericht. Andere
+Modifier behalten den schnellen normalen Ablauf.
 
 ## Datenfluss
 
@@ -65,7 +63,8 @@ Commit-Marker wird nach Rücklesen und Prüfen des Inhalts zuletzt geschrieben.
 
 Der Typer ist eine nicht blockierende Zustandsmaschine. Er sendet pro Zeichen
 Modifier und Taste, danach einen leeren Release-Report und wartet die gewählte
-Zeit. Dead Keys wie `~`, Akut und Backtick erhalten anschließend ein
+Zeit. AltGr wird mit getrennten Modifier-, Tasten- und Release-Berichten
+gestaffelt. Dead Keys wie `~`, Akut und Backtick erhalten anschließend ein
 Leerzeichen. Ein zweiter Druck auf V wechselt immer in den Release-All-Pfad.
 
 Beim Anschluss, bei der USB-Anmeldung und nach einem Reset wird nie gespeicherter
@@ -73,12 +72,15 @@ Text ausgegeben. Im TARGET-Modus startet nur eine entprellte physische
 V-Flanke das Tippen; im bewusst gewählten AFK-Modus starten C oder Strg+C.
 
 Im normalen TARGET-Modus wählt die linke Taste die nächstlangsamere und die
-mittlere Taste die nächstschnellere der acht persistenten Stufen. Im AFK-Modus
-startet die mittlere Taste eine Endloswiederholung, die rechte stoppt sie und
-links plus Mitte startet einen einzelnen Durchlauf. Jeder Abstand zwischen
-HID-Tastenberichten und jede Pause zwischen AFK-Wiederholungen wird unabhängig
-aus `5, 25, 50, 100, 250, 500, 750, 1000 ms` gezogen. Die GPIO-Tasten selbst
-werden dabei nie als die Zeichen C oder V an USB weitergegeben.
+mittlere Taste die nächstschnellere der acht persistenten Stufen. Das gilt auch
+während einer laufenden Ausgabe; die Zustandsmaschine übernimmt die neue Pause
+ab dem nächsten Zeichenabstand und schreibt die letzte Auswahl erst nach Ende
+oder Abbruch in das Flash-Journal. Im AFK-Modus startet die mittlere Taste eine
+Endloswiederholung, die rechte stoppt sie und links plus Mitte startet einen
+einzelnen Durchlauf. Jeder Abstand zwischen HID-Tastenberichten und jede Pause
+zwischen AFK-Wiederholungen wird unabhängig aus
+`5, 25, 50, 100, 250, 500, 750, 1000 ms` gezogen. Die GPIO-Tasten selbst werden
+dabei nie als die Zeichen C oder V an USB weitergegeben.
 
 ## Dienste
 
@@ -96,6 +98,6 @@ Die Firmware läuft einkernig und ereignisgesteuert. Flash-Zugriffe verwenden
 
 Die Hostseite ist in drei Projekte getrennt:
 
-- `CopyCop.Core`: HID, Protokoll, CRC, Layout, Bewertung und Aufteilung
+- `CopyCop.Core`: HID, Protokoll, CRC, Layout, Bewertung, Aufteilung und Tippdauer
 - `CopyCop.Gui`: Avalonia-Desktopoberfläche für Windows, macOS und Linux
 - `copycop-cli`: plattformübergreifende Kommandozeile

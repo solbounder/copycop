@@ -8,8 +8,9 @@
 | linkergetrennter Flash, CRC32, A/B-Commit, Speed-Journal | implementiert; Stromausfalltest am Gerät noch offen |
 | gemeinsamer .NET-8-Core und plattformübergreifende CLI | implementiert; Windows-, Linux- und macOS-Builds erzeugt |
 | Avalonia-GUI ohne Konsole | implementiert; Normal-, Unicode- und Überlaufansicht unter Windows visuell geprüft |
-| deutsches QWERTZ, Unicode-Prüfung, Normalisierung, acht Geschwindigkeiten | implementiert und offline getestet |
-| wählbarer VDI-/RDP-AltGr-Fallback (`Ctrl+Alt`) | implementiert und kompiliert; Test in der betroffenen VDI noch offen |
+| deutsches QWERTZ, Unicode-Prüfung, Normalisierung, acht Geschwindigkeiten | implementiert und offline getestet; Geschwindigkeit kann auch während der normalen Ausgabe geändert werden |
+| firmwaretreue Tippdauer für alle acht Geschwindigkeiten in der GUI | implementiert und offline getestet |
+| gestaffeltes echtes AltGr im normalen Zielmodus | implementiert und kompiliert; Test am betroffenen Ziel noch offen |
 | AFK-Bootmodus, zufällige Abstände, Endlos-/Einmalausgabe und Stopp | implementiert und kompiliert; Gerätetest noch offen |
 | Abbruch/Release-All, Update-Geste, Watchdog, Dokumentation | implementiert |
 
@@ -26,10 +27,12 @@ nach dem Flashen einen kurzen manuellen Test:
 2. C beim Einstecken halten: nur `CopyCop Clipboard Loader`, blaue Anzeige.
 3. Beispieltext laden, abziehen, normal einstecken und mit V in Notepad tippen.
 4. Einen längeren Text starten und mit einem zweiten V abbrechen.
-5. Text erneut laden, abziehen, wieder einstecken und Persistenz prüfen.
-6. Nur Strg beim Einstecken halten: violette AFK-Anzeige und weiterhin nur
+5. Während eines längeren Texts mit Strg verlangsamen und mit C beschleunigen;
+   Farbwechsel und geändertes Tipptempo prüfen.
+6. Text erneut laden, abziehen, wieder einstecken und Persistenz prüfen.
+7. Nur Strg beim Einstecken halten: violette AFK-Anzeige und weiterhin nur
    `CopyCop Keyboard` prüfen.
-7. In AFK C für Wiederholung, V für Stopp und physisches Strg+C für genau einen
+8. In AFK C für Wiederholung, V für Stopp und physisches Strg+C für genau einen
    zufällig getakteten Durchlauf prüfen.
-8. Nur V beim Einstecken halten: türkise Startanzeige, danach in der VDI den
-   Testtext `@€\\|[]{}~` vollständig und ohne Grundzeichen ausgeben.
+9. Normal einstecken und den Testtext `@€\\|[]{}~` vollständig und ohne
+   Grundzeichen ausgeben.

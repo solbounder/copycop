@@ -15,7 +15,9 @@ macOS: Beim ersten Start kann für den nicht signierten lokalen Build
 Rechtsklick → Öffnen nötig sein. Die CLI liegt neben `CopyCop.app`.
 
 Jeder gespeicherte Teil darf maximal 126.464 UTF-8-Bytes groß sein. Die GUI
-zeigt die genaue Belegung und kann längere Texte verlustfrei aufteilen.
+zeigt die genaue Belegung, kann längere Texte verlustfrei aufteilen und
+berechnet die Tippdauer für alle acht Geschwindigkeiten.
 
 Der Reiter `Bedienung & LEDs` erklärt alle physischen Tastenkombinationen,
 Startmodi, Geschwindigkeitsfarben und weiteren LED-Signale direkt in der GUI.
+Im Normalmodus ändern Strg und C das Tempo auch während CopyCop gerade tippt.
