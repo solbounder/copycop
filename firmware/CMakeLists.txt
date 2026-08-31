@@ -15,7 +15,7 @@ file(TO_CMAKE_PATH "${_copycop_pico_sdk_path}" _copycop_pico_sdk_path)
 set(PICO_SDK_PATH "${_copycop_pico_sdk_path}" CACHE PATH "Pico SDK path" FORCE)
 include("${PICO_SDK_PATH}/external/pico_sdk_import.cmake")
 
-project(copycop_firmware VERSION 0.3.0 LANGUAGES C CXX ASM)
+project(copycop_firmware VERSION 0.4.0 LANGUAGES C CXX ASM)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)

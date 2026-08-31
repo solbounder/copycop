@@ -21,6 +21,7 @@ static uint16_t configured_delay_ms;
 static const uint16_t *configured_random_delays_ms;
 static size_t configured_random_delay_count;
 static bool random_timing;
+static bool use_altgr_compatibility;
 static absolute_time_t next_action;
 static copycop_key_sequence_t current_sequence;
 static uint8_t sequence_index;
@@ -39,9 +40,10 @@ static void request_finish(bool error) {
     next_action = get_absolute_time();
 }
 
-void typer_init(void) {
+void typer_init(bool altgr_compatibility) {
     phase = TYPER_IDLE;
     error_seen = false;
+    use_altgr_compatibility = altgr_compatibility;
 }
 
 static bool start_common(const uint8_t *utf8, size_t length) {
@@ -88,7 +90,8 @@ void typer_task(void) {
             }
             uint32_t codepoint;
             if (!utf8_decode_next(text_bytes, text_length, &text_offset, &codepoint)
-                || !keyboard_layout_de_map(codepoint, &current_sequence)) {
+                || !keyboard_layout_de_map(codepoint, use_altgr_compatibility,
+                                           &current_sequence)) {
                 request_finish(true);
                 return;
             }

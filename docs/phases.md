@@ -9,6 +9,7 @@
 | gemeinsamer .NET-8-Core und plattformübergreifende CLI | implementiert; Windows-, Linux- und macOS-Builds erzeugt |
 | Avalonia-GUI ohne Konsole | implementiert; Normal-, Unicode- und Überlaufansicht unter Windows visuell geprüft |
 | deutsches QWERTZ, Unicode-Prüfung, Normalisierung, acht Geschwindigkeiten | implementiert und offline getestet |
+| wählbarer VDI-/RDP-AltGr-Fallback (`Ctrl+Alt`) | implementiert und kompiliert; Test in der betroffenen VDI noch offen |
 | AFK-Bootmodus, zufällige Abstände, Endlos-/Einmalausgabe und Stopp | implementiert und kompiliert; Gerätetest noch offen |
 | Abbruch/Release-All, Update-Geste, Watchdog, Dokumentation | implementiert |
 
@@ -30,3 +31,5 @@ nach dem Flashen einen kurzen manuellen Test:
    `CopyCop Keyboard` prüfen.
 7. In AFK C für Wiederholung, V für Stopp und physisches Strg+C für genau einen
    zufällig getakteten Durchlauf prüfen.
+8. Nur V beim Einstecken halten: türkise Startanzeige, danach in der VDI den
+   Testtext `@€\\|[]{}~` vollständig und ohne Grundzeichen ausgeben.

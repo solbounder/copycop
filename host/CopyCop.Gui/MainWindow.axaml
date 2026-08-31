@@ -221,6 +221,13 @@
                       </StackPanel>
                     </Grid>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                      <Border Classes="keycap"><TextBlock Text="V" FontSize="11" FontWeight="SemiBold" TextAlignment="Center" /></Border>
+                      <StackPanel Grid.Column="1" Spacing="1">
+                        <TextBlock Text="VDI-/Remote-Desktop-Ziel" Classes="sectionTitle" />
+                        <TextBlock Text="V halten · kurz türkis, dann grün · AltGr-kompatibel" Classes="muted" FontSize="11" />
+                      </StackPanel>
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
                       <Border Classes="keycap"><TextBlock Text="alle 3" FontSize="11" FontWeight="SemiBold" TextAlignment="Center" /></Border>
                       <StackPanel Grid.Column="1" Spacing="1">
                         <TextBlock Text="Firmware-Update" Classes="sectionTitle" />
@@ -262,6 +269,8 @@
                     </Grid>
 
                     <TextBlock Text="Gemeint sind immer die drei Tasten auf CopyCop. C oder V auf dem Laptop lösen nichts aus."
+                               Classes="muted" FontSize="11" TextWrapping="Wrap" LineHeight="16" />
+                    <TextBlock Text="Wenn in einer VDI { zu 7, } zu 0 oder | zu &lt; wird: CopyCop abziehen und beim Einstecken V halten."
                                Classes="muted" FontSize="11" TextWrapping="Wrap" LineHeight="16" />
                   </StackPanel>
                 </Border>

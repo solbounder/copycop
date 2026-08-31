@@ -383,6 +383,11 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
             {
                 break;
             }
+            catch (System.Threading.Channels.ChannelClosedException)
+            {
+                ActivityText = "CopyCop wurde getrennt. LOAD-Gerät wird erneut gesucht …";
+                ActivityBrush = Muted;
+            }
             catch (Exception exception)
             {
                 ActivityText = $"Verbindung getrennt: {exception.Message}";

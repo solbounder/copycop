@@ -43,6 +43,7 @@ Beim Einstecken wählt eine gehaltene Gerätetaste den Modus:
 - keine Taste: grüner Normalbetrieb,
 - nur die linke Strg-Taste: violetter AFK-Modus,
 - mittlere C-Taste: blauer LOAD-Modus,
+- nur die rechte V-Taste: türkiser VDI-/Remote-Desktop-Modus,
 - alle drei Tasten: weißer Firmware-Update-Modus.
 
 ## Programme
@@ -104,8 +105,9 @@ benötigt.
 4. Text in der GUI einfügen und auf „speichern“ klicken – oder Text normal
    kopieren und am Gerät C drücken.
 5. Nach der grünen Bestätigung abziehen.
-6. Am Ziel-PC ohne gedrückte Taste einstecken und deutsches Tastaturlayout
-   auswählen.
+6. Am normalen Ziel-PC ohne gedrückte Taste einstecken. Bei einer VDI-/RDP-
+   Sitzung stattdessen V halten, CopyCop einstecken und nach der türkisen
+   Startanzeige loslassen. In beiden Fällen deutsches Tastaturlayout auswählen.
 7. Cursor platzieren und rechts V drücken. Ein zweites V bricht sofort ab.
 
 Im TARGET-Modus besitzt CopyCop genau eine USB-Schnittstelle: eine
@@ -119,6 +121,16 @@ Im Normalbetrieb stehen `5, 25, 50, 100, 250, 500, 750, 1000 ms` zur Auswahl;
 `5 ms` ist die Werkseinstellung. C macht schneller, Strg macht langsamer. An
 der schnellsten beziehungsweise langsamsten Grenze bleibt die Einstellung
 stehen. Die Auswahl bleibt nach dem Abziehen erhalten.
+
+### VDI- und Remote-Desktop-Ziele
+
+Manche VDI-, RDP- oder Browser-Remote-Sitzungen verschlucken den nativen
+rechten Alt-/AltGr-Modifier. Typische Symptome sind `{` als `7`, `}` als `0`
+und `|` als `<`, obwohl der Text korrekt gespeichert wurde. Der mit V beim
+Einstecken gewählte VDI-Modus sendet AltGr-Zeichen deshalb kompatibel als
+`Ctrl+Alt`. CopyCop bleibt dabei weiterhin ausschließlich eine USB-Tastatur.
+Die türkise Farbe erscheint nur kurz beim Start; danach leuchtet das Gerät wie
+im normalen Zielmodus schwach grün.
 
 ## AFK-Modus
 

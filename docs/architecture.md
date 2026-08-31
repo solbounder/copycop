@@ -11,6 +11,7 @@ dass Windows zwischengespeicherte USB-Deskriptoren des anderen Modus verwendet.
 | keine Taste | genau ein Boot-Keyboard-HID | `CAFE:4030` | grün |
 | nur linke Taste gehalten | genau ein Boot-Keyboard-HID | `CAFE:4030` | violett |
 | mittlere Taste gehalten | genau ein Generic-IN/OUT-HID | `CAFE:4031` | blau |
+| nur rechte Taste gehalten | genau ein Boot-Keyboard-HID, AltGr als `Ctrl+Alt` | `CAFE:4030` | kurz türkis, dann grün |
 | alle drei Tasten gehalten | RP2040-ROM-Update-Laufwerk | ROM | weiß |
 
 `0xCAFE` ist eine Prototyp-VID und nicht für eine öffentliche Produktverteilung
@@ -21,6 +22,13 @@ TARGET und AFK enthalten absichtlich kein CDC, Mass Storage, MIDI, Netzwerk und
 keine Vendor-Konfiguration. LOAD enthält absichtlich kein Keyboard. Deshalb
 kann der Lade-PC während einer Übertragung keine Tastatureingaben vom Gerät
 erhalten.
+
+Der VDI-Zielmodus besitzt denselben USB-Deskriptor wie TARGET. Er verändert nur
+die Tastenkombination für Zeichen der dritten deutschen Belegungsebene: Weil
+einige Remote-Sitzungen Right-Alt verwerfen, werden diese Zeichen dort mit dem
+unter Windows gleichwertigen `Ctrl+Alt` erzeugt. Der Modus wird ausschließlich
+durch die rechte Gerätetaste beim Einstecken gewählt und ist daher nicht
+versehentlich aus der Ferne aktivierbar.
 
 ## Datenfluss
 

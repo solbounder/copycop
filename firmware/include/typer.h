@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void typer_init(void);
+void typer_init(bool altgr_compatibility);
 bool typer_start(const uint8_t *utf8, size_t length, uint16_t inter_key_delay_ms);
 bool typer_start_random(const uint8_t *utf8, size_t length,
                         const uint16_t *delay_levels_ms, size_t delay_level_count);
