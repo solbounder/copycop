@@ -1,0 +1,2 @@
+# CopyCop LOAD mode (prototype VID/PID)
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="cafe", ATTRS{idProduct}=="4031", MODE="0660", TAG+="uaccess"

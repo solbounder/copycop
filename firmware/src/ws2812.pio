@@ -1,0 +1,21 @@
+;
+; 800 kHz WS2812 transmitter for RP2040.
+; Timing is expressed as a ten-cycle bit cell.
+;
+.program ws2812
+.side_set 1
+
+.define public T1 2
+.define public T2 5
+.define public T3 3
+
+.wrap_target
+bitloop:
+    out x, 1        side 0 [T3 - 1]
+    jmp !x do_zero  side 1 [T1 - 1]
+do_one:
+    jmp bitloop     side 1 [T2 - 1]
+do_zero:
+    nop             side 0 [T2 - 1]
+.wrap
+
