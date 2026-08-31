@@ -33,7 +33,7 @@ außerdem die geschätzte Tippdauer bei allen acht Geschwindigkeitsstufen an.
 |---|---|---|---|
 | links (`Ctrl`) | langsamer, auch während der Ausgabe | ohne Funktion | zusammen mit C: genau einmal tippen |
 | Mitte (`C`) | schneller, auch während der Ausgabe | Zwischenablage übernehmen und speichern | Endloswiederholung starten |
-| rechts (`V`) | Text tippen; erneut drücken = abbrechen | ohne Funktion | Wiederholung sofort stoppen |
+| rechts (`V`) | starten; kurz drücken = Pause/Weiter; 0,8 s halten = Abbruch | ohne Funktion | Wiederholung sofort stoppen |
 
 Die Beschriftungen `Ctrl`, `C` und `V` beschreiben nur die Tastenkappen. Es
 wird kein einzelnes `C`, `V` oder `Ctrl` an den Ziel-PC gesendet. Auch C oder V
@@ -107,7 +107,8 @@ benötigt.
 5. Nach der grünen Bestätigung abziehen.
 6. Am Ziel-PC ohne gedrückte Taste einstecken und deutsches Tastaturlayout
    auswählen.
-7. Cursor platzieren und rechts V drücken. Ein zweites V bricht sofort ab.
+7. Cursor platzieren und V kurz drücken. Weitere kurze V-Drücke pausieren die
+   Ausgabe beziehungsweise setzen sie fort; etwa 0,8 Sekunden halten bricht sie ab.
 
 Im TARGET-Modus besitzt CopyCop genau eine USB-Schnittstelle: eine
 Standard-HID-Tastatur. Es gibt dort weder Laufwerk noch COM-Port,
@@ -116,8 +117,8 @@ Programm und keinen zusätzlichen Treiber.
 
 ## Geschwindigkeit und Zeichen
 
-Im Normalbetrieb stehen `5, 25, 50, 100, 250, 500, 750, 1000 ms` zur Auswahl;
-`5 ms` ist die Werkseinstellung. C macht schneller, Strg macht langsamer. An
+Im Normalbetrieb stehen `10, 25, 50, 100, 250, 500, 750, 1000 ms` zur Auswahl;
+`10 ms` ist die Werkseinstellung. C macht schneller, Strg macht langsamer. An
 der schnellsten beziehungsweise langsamsten Grenze bleibt die Einstellung
 stehen. Beide Tasten können auch während des Tippens verwendet werden; die
 neue Stufe gilt ab dem nächsten Zeichenabstand und wird nach Ende oder Abbruch
@@ -127,7 +128,8 @@ erhalten.
 Die Tippdauer in der GUI berücksichtigt pro HID-Tastenfolge die gewählte Pause,
 die Haltezeit und die längere gestaffelte Ausgabe von AltGr-Zeichen. Sie ist
 eine sehr genaue Schätzung; Betriebssystem, USB-Weiterleitung und Zielprogramm
-können noch geringe zusätzliche Verzögerungen verursachen.
+können noch geringe zusätzliche Verzögerungen verursachen. Manuell mit V
+eingelegte Pausen zählen nicht zur Schätzung.
 
 ### AltGr-Zeichen
 
@@ -148,7 +150,7 @@ verlieren. Ein zusätzlicher Zielmodus ist dafür nicht nötig.
 
 Physisches Strg+C startet stattdessen genau einen Durchlauf und stoppt danach.
 Bei beiden AFK-Arten wird für jeden Tastenabstand zufällig einer der acht Werte
-`5, 25, 50, 100, 250, 500, 750, 1000 ms` gewählt. Bei der Endlosschleife wird
+`10, 25, 50, 100, 250, 500, 750, 1000 ms` gewählt. Bei der Endlosschleife wird
 auch die Pause zwischen zwei vollständigen Texten zufällig aus diesen Werten
 gewählt. CopyCop fügt selbst keinen Zeilenumbruch oder Trenner hinzu.
 
@@ -162,7 +164,8 @@ durch `?` ersetzt werden.
 
 CopyCop gibt gespeicherten Text wie eine echte Tastatur in das aktuell
 fokussierte Fenster ein. Vor V, C im AFK-Modus oder Strg+C deshalb immer das
-richtige Zielfenster und den Cursor prüfen. Der LOAD-Transport besitzt keine
+richtige Zielfenster und den Cursor prüfen. Ein kurzer V-Druck pausiert sicher,
+ein langer V-Druck bricht die normale Ausgabe ab. Der LOAD-Transport besitzt keine
 Benutzeranmeldung oder Verschlüsselung; Passwörter und andere Geheimnisse
 sollten nicht dauerhaft auf dem Gerät gespeichert werden.
 

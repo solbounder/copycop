@@ -179,8 +179,8 @@
               <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,*"
                     RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="7" RowSpacing="5">
                 <Border Width="10" Height="10" CornerRadius="5" Background="#36D7D9" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="1" Text="5 ms" FontWeight="SemiBold" FontSize="12" />
-                <TextBlock Grid.Column="2" Text="{Binding Duration5}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="1" Text="10 ms" FontWeight="SemiBold" FontSize="12" />
+                <TextBlock Grid.Column="2" Text="{Binding Duration10}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
                 <Border Grid.Column="3" Width="10" Height="10" CornerRadius="5" Background="#36D98B" VerticalAlignment="Center" />
                 <TextBlock Grid.Column="4" Text="25 ms" FontWeight="SemiBold" FontSize="12" />
                 <TextBlock Grid.Column="5" Text="{Binding Duration25}" Classes="muted" FontSize="12" HorizontalAlignment="Right" />
@@ -278,7 +278,7 @@
                       <TextBlock Grid.Row="1" Text="C" FontWeight="SemiBold" />
                       <TextBlock Grid.Row="1" Grid.Column="1" Text="schneller · auch beim Tippen" Classes="muted" />
                       <TextBlock Grid.Row="2" Text="V" FontWeight="SemiBold" />
-                      <TextBlock Grid.Row="2" Grid.Column="1" Text="Text tippen · erneut drücken = Stopp" Classes="muted" TextWrapping="Wrap" />
+                      <TextBlock Grid.Row="2" Grid.Column="1" Text="Start · kurz: Pause/Weiter · 0,8 s halten: Abbruch" Classes="muted" TextWrapping="Wrap" />
                     </Grid>
 
                     <Border Height="1" Background="#253552" Margin="0,2" />
@@ -313,7 +313,7 @@
                     <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto"
                           ColumnSpacing="9" RowSpacing="10">
                       <Border Width="13" Height="13" CornerRadius="7" Background="#36D7D9" VerticalAlignment="Center" />
-                      <TextBlock Grid.Column="1" Text="5 ms" FontWeight="SemiBold" />
+                      <TextBlock Grid.Column="1" Text="10 ms" FontWeight="SemiBold" />
                       <Border Grid.Column="2" Width="13" Height="13" CornerRadius="7" Background="#36D98B" VerticalAlignment="Center" />
                       <TextBlock Grid.Column="3" Text="25 ms" FontWeight="SemiBold" />
 
@@ -340,7 +340,7 @@
                 <Border Classes="softCard">
                   <StackPanel Spacing="11">
                     <TextBlock Text="WEITERE LED-SIGNALE" Classes="eyebrow" />
-                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="9">
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="9">
                       <Border Width="13" Height="13" CornerRadius="7" Background="#3DD6D0" VerticalAlignment="Center" />
                       <TextBlock Grid.Column="1" Text="Cyan · Text wird gerade getippt" Classes="muted" />
                       <Border Grid.Row="1" Width="13" Height="13" CornerRadius="7" Background="#FFC66D" VerticalAlignment="Center" />
@@ -348,7 +348,9 @@
                       <Border Grid.Row="2" Width="13" Height="13" CornerRadius="7" Background="#63E6A5" VerticalAlignment="Center" />
                       <TextBlock Grid.Row="2" Grid.Column="1" Text="Grün · erfolgreich gespeichert" Classes="muted" />
                       <Border Grid.Row="3" Width="13" Height="13" CornerRadius="7" Background="#FF5D73" VerticalAlignment="Center" />
-                      <TextBlock Grid.Row="3" Grid.Column="1" Text="Rot · Fehler oder kein Text" Classes="muted" />
+                      <TextBlock Grid.Row="3" Grid.Column="1" Text="Rot · Fehler, kein Text oder Abbruch" Classes="muted" />
+                      <Border Grid.Row="4" Width="13" Height="13" CornerRadius="7" Background="#B84DEB" VerticalAlignment="Center" />
+                      <TextBlock Grid.Row="4" Grid.Column="1" Text="Violett · Ausgabe pausiert" Classes="muted" />
                     </Grid>
                   </StackPanel>
                 </Border>

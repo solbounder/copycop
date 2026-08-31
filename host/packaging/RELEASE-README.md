@@ -21,3 +21,5 @@ berechnet die Tippdauer für alle acht Geschwindigkeiten.
 Der Reiter `Bedienung & LEDs` erklärt alle physischen Tastenkombinationen,
 Startmodi, Geschwindigkeitsfarben und weiteren LED-Signale direkt in der GUI.
 Im Normalmodus ändern Strg und C das Tempo auch während CopyCop gerade tippt.
+V pausiert beziehungsweise setzt mit kurzem Druck fort; etwa 0,8 Sekunden
+Haltedauer brechen die Ausgabe vollständig ab.

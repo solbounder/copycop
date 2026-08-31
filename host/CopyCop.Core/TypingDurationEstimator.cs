@@ -27,7 +27,7 @@ public static class TypingDurationEstimator
         AltGrSettleMilliseconds * 2 + AltGrKeyHoldMilliseconds;
 
     public static IReadOnlyList<int> SpeedLevelsMilliseconds { get; } =
-        [5, 25, 50, 100, 250, 500, 750, 1000];
+        [10, 25, 50, 100, 250, 500, 750, 1000];
 
     public static TypingWorkload Analyze(string text)
     {

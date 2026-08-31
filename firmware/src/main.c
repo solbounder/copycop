@@ -23,13 +23,14 @@ static const copycop_rgb_t TARGET_IDLE_COLOR = {0u, 5u, 0u};
 static const copycop_rgb_t LOAD_IDLE_COLOR = {0u, 0u, 5u};
 static const copycop_rgb_t AFK_IDLE_COLOR = {4u, 0u, 6u};
 static const copycop_rgb_t TYPING_COLOR = {0u, 18u, 20u};
+static const copycop_rgb_t PAUSED_COLOR = {18u, 0u, 24u};
 static const copycop_rgb_t TRANSFER_COLOR = {20u, 10u, 0u};
 static const copycop_rgb_t ERROR_COLOR = {32u, 0u, 0u};
 static const copycop_rgb_t SUCCESS_COLOR = {0u, 32u, 0u};
 static const copycop_rgb_t UPDATE_BOOT_COLOR = {24u, 24u, 24u};
 
 static const uint16_t SPEED_LEVELS_MS[COPYCOP_SPEED_LEVEL_COUNT] = {
-    5u, 25u, 50u, 100u, 250u, 500u, 750u, 1000u,
+    10u, 25u, 50u, 100u, 250u, 500u, 750u, 1000u,
 };
 
 static const copycop_rgb_t SPEED_COLORS[COPYCOP_SPEED_LEVEL_COUNT] = {
@@ -59,6 +60,7 @@ static copycop_rgb_t select_display_color(copycop_app_mode_t mode,
                                           bool override_active,
                                           copycop_rgb_t override_color) {
     if (override_active) return override_color;
+    if (typer_is_paused()) return PAUSED_COLOR;
     if (typer_is_active()) return TYPING_COLOR;
     if (mode == COPYCOP_MODE_LOAD && protocol_transfer_active()) return TRANSFER_COLOR;
     if (typer_had_error()) return ERROR_COLOR;
@@ -124,6 +126,11 @@ int main(void) {
     bool speed_save_pending = false;
     absolute_time_t afk_next_repeat = nil_time;
 
+    bool right_press_tracking = false;
+    bool right_long_press_handled = false;
+    bool right_resume_on_short_release = false;
+    absolute_time_t right_press_started = nil_time;
+
     copycop_rgb_t displayed = select_display_color(mode, false, color_override);
     status_led_show_solid(displayed);
 
@@ -134,16 +141,27 @@ int main(void) {
         buttons_poll();
 
         bool pressed_edges[COPYCOP_BUTTON_COUNT];
+        bool released_edges[COPYCOP_BUTTON_COUNT];
         for (unsigned int index = 0; index < COPYCOP_BUTTON_COUNT; ++index) {
             const bool pressed = buttons_is_pressed((copycop_button_t)index);
             pressed_edges[index] = pressed && !previous_buttons[index];
+            released_edges[index] = !pressed && previous_buttons[index];
             previous_buttons[index] = pressed;
         }
 
         if (mode == COPYCOP_MODE_TARGET) {
             if (pressed_edges[COPYCOP_BUTTON_RIGHT]) {
+                right_press_tracking = true;
+                right_long_press_handled = false;
+                right_resume_on_short_release = false;
+                right_press_started = get_absolute_time();
+
                 if (typer_is_active()) {
-                    typer_cancel();
+                    if (typer_is_paused()) {
+                        right_resume_on_short_release = true;
+                    } else {
+                        typer_pause();
+                    }
                 } else {
                     const uint8_t *text;
                     size_t text_length;
@@ -156,6 +174,30 @@ int main(void) {
                     }
                 }
             }
+
+            if (right_press_tracking && !right_long_press_handled
+                && buttons_is_pressed(COPYCOP_BUTTON_RIGHT)
+                && absolute_time_diff_us(right_press_started, get_absolute_time())
+                    >= COPYCOP_CANCEL_HOLD_MS * 1000u) {
+                right_long_press_handled = true;
+                right_resume_on_short_release = false;
+                if (typer_is_active()) {
+                    typer_cancel();
+                    color_override = ERROR_COLOR;
+                    color_override_until = make_timeout_time_ms(600u);
+                    color_override_active = true;
+                }
+            }
+
+            if (released_edges[COPYCOP_BUTTON_RIGHT] && right_press_tracking) {
+                if (!right_long_press_handled && right_resume_on_short_release
+                    && typer_is_active()) {
+                    typer_resume();
+                }
+                right_press_tracking = false;
+                right_resume_on_short_release = false;
+            }
+
             if (pressed_edges[COPYCOP_BUTTON_LEFT]) {
                 const unsigned int next_index = speed_index + 1u
                     < COPYCOP_SPEED_LEVEL_COUNT ? speed_index + 1u : speed_index;

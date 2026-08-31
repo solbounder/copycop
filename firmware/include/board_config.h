@@ -73,6 +73,7 @@
 #define COPYCOP_KEY_HOLD_MS               1u
 #define COPYCOP_ALTGR_SETTLE_MS           35u
 #define COPYCOP_ALTGR_KEY_HOLD_MS         15u
+#define COPYCOP_CANCEL_HOLD_MS            800u
 
 #if COPYCOP_BOOT_PRESSED_THRESHOLD > COPYCOP_BOOT_SAMPLE_COUNT
 #error "Boot pressed threshold cannot exceed the sample count"

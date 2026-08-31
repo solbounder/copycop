@@ -65,7 +65,9 @@ Der Typer ist eine nicht blockierende Zustandsmaschine. Er sendet pro Zeichen
 Modifier und Taste, danach einen leeren Release-Report und wartet die gewählte
 Zeit. AltGr wird mit getrennten Modifier-, Tasten- und Release-Berichten
 gestaffelt. Dead Keys wie `~`, Akut und Backtick erhalten anschließend ein
-Leerzeichen. Ein zweiter Druck auf V wechselt immer in den Release-All-Pfad.
+Leerzeichen. Ein kurzer V-Druck pausiert am nächsten sicheren Release-Punkt;
+ein weiterer kurzer Druck setzt denselben Text fort. Nach 800 ms Haltedauer
+wechselt V in den Release-All-Abbruchpfad.
 
 Beim Anschluss, bei der USB-Anmeldung und nach einem Reset wird nie gespeicherter
 Text ausgegeben. Im TARGET-Modus startet nur eine entprellte physische
@@ -79,7 +81,7 @@ oder Abbruch in das Flash-Journal. Im AFK-Modus startet die mittlere Taste eine
 Endloswiederholung, die rechte stoppt sie und links plus Mitte startet einen
 einzelnen Durchlauf. Jeder Abstand zwischen HID-Tastenberichten und jede Pause
 zwischen AFK-Wiederholungen wird unabhängig aus
-`5, 25, 50, 100, 250, 500, 750, 1000 ms` gezogen. Die GPIO-Tasten selbst werden
+`10, 25, 50, 100, 250, 500, 750, 1000 ms` gezogen. Die GPIO-Tasten selbst werden
 dabei nie als die Zeichen C oder V an USB weitergegeben.
 
 ## Dienste

@@ -182,9 +182,9 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         ? "Text eingeben, um die Tippdauer zu berechnen."
         : HasBlockingUnsupported
             ? "Die Dauer ist nach Ersetzen oder Entfernen unbekannter Zeichen verfügbar."
-            : $"{typingWorkload.StrokeCount:N0} Tastenfolgen · AltGr-Zeiten eingerechnet";
+            : $"{typingWorkload.StrokeCount:N0} Tastenfolgen · AltGr inklusive · ohne manuelle Pausen";
 
-    public string Duration5 => EstimateAt(5);
+    public string Duration10 => EstimateAt(10);
     public string Duration25 => EstimateAt(25);
     public string Duration50 => EstimateAt(50);
     public string Duration100 => EstimateAt(100);
@@ -263,7 +263,7 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         OnPropertyChanged(nameof(SplitSummary));
         OnPropertyChanged(nameof(SendButtonText));
         OnPropertyChanged(nameof(TypingEstimateHint));
-        OnPropertyChanged(nameof(Duration5));
+        OnPropertyChanged(nameof(Duration10));
         OnPropertyChanged(nameof(Duration25));
         OnPropertyChanged(nameof(Duration50));
         OnPropertyChanged(nameof(Duration100));

@@ -30,6 +30,8 @@ static copycop_key_sequence_t current_sequence;
 static uint8_t sequence_index;
 static typer_phase_t phase;
 static bool error_seen;
+static bool pause_requested;
+static bool paused;
 
 static uint16_t next_delay_ms(void) {
     if (!random_timing) return configured_delay_ms;
@@ -42,14 +44,33 @@ static bool uses_staged_altgr(copycop_key_stroke_t stroke) {
 }
 
 static void request_finish(bool error) {
+    pause_requested = false;
+    paused = false;
     phase = TYPER_FINAL_RELEASE;
     error_seen = error;
     next_action = get_absolute_time();
 }
 
+static void enter_paused(void) {
+    pause_requested = false;
+    paused = true;
+    next_action = get_absolute_time();
+}
+
+static bool can_enter_pause_now(void) {
+    if (phase == TYPER_PREPARE || phase == TYPER_MODIFIER_PRESS
+        || phase == TYPER_GAP) {
+        return true;
+    }
+    return phase == TYPER_KEY_PRESS
+        && !uses_staged_altgr(current_sequence.strokes[sequence_index]);
+}
+
 void typer_init(void) {
     phase = TYPER_IDLE;
     error_seen = false;
+    pause_requested = false;
+    paused = false;
 }
 
 static bool start_common(const uint8_t *utf8, size_t length) {
@@ -59,6 +80,8 @@ static bool start_common(const uint8_t *utf8, size_t length) {
     sequence_index = 0u;
     current_sequence.count = 0u;
     error_seen = false;
+    pause_requested = false;
+    paused = false;
     phase = TYPER_PREPARE;
     next_action = get_absolute_time();
     return true;
@@ -87,8 +110,30 @@ void typer_set_delay_ms(uint16_t inter_key_delay_ms) {
     if (!random_timing) configured_delay_ms = inter_key_delay_ms;
 }
 
+void typer_pause(void) {
+    if (phase != TYPER_IDLE && phase != TYPER_FINAL_RELEASE && !paused) {
+        pause_requested = true;
+    }
+}
+
+void typer_resume(void) {
+    if (phase == TYPER_IDLE || (!paused && !pause_requested)) return;
+    pause_requested = false;
+    paused = false;
+    next_action = get_absolute_time();
+}
+
 void typer_task(void) {
-    if (phase == TYPER_IDLE || absolute_time_diff_us(get_absolute_time(), next_action) > 0) {
+    if (phase == TYPER_IDLE || paused) {
+        return;
+    }
+
+    if (pause_requested && can_enter_pause_now()) {
+        enter_paused();
+        return;
+    }
+
+    if (absolute_time_diff_us(get_absolute_time(), next_action) > 0) {
         return;
     }
 
@@ -121,7 +166,11 @@ void typer_task(void) {
     }
 
     if (phase == TYPER_FINAL_RELEASE) {
-        if (copycop_usb_keyboard_release_all()) phase = TYPER_IDLE;
+        if (copycop_usb_keyboard_release_all()) {
+            pause_requested = false;
+            paused = false;
+            phase = TYPER_IDLE;
+        }
         return;
     }
 
@@ -153,7 +202,11 @@ void typer_task(void) {
         if (!copycop_usb_keyboard_release_all()) return;
         ++sequence_index;
         phase = TYPER_GAP;
-        next_action = make_timeout_time_ms(next_delay_ms());
+        if (pause_requested) {
+            enter_paused();
+        } else {
+            next_action = make_timeout_time_ms(next_delay_ms());
+        }
         return;
     }
 
@@ -161,7 +214,11 @@ void typer_task(void) {
         if (!copycop_usb_keyboard_release_all()) return;
         ++sequence_index;
         phase = TYPER_GAP;
-        next_action = make_timeout_time_ms(next_delay_ms());
+        if (pause_requested) {
+            enter_paused();
+        } else {
+            next_action = make_timeout_time_ms(next_delay_ms());
+        }
         return;
     }
 
@@ -175,6 +232,10 @@ void typer_cancel(void) {
 
 bool typer_is_active(void) {
     return phase != TYPER_IDLE;
+}
+
+bool typer_is_paused(void) {
+    return phase != TYPER_IDLE && (paused || pause_requested);
 }
 
 bool typer_had_error(void) {
