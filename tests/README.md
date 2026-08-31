@@ -3,7 +3,7 @@
 Die Tests benötigen .NET 8; die Abhängigkeiten werden über NuGet wiederhergestellt:
 
 ```powershell
-dotnet run --project tests/ClipboardBridge.Tests -c Release
+dotnet run --project tests/CopyCop.Cli.Tests -c Release
 ```
 
 Sie prüfen CRC32, HID-Protokoll-Roundtrip und Fehlererkennung, Chunking,

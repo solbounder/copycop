@@ -1,5 +1,9 @@
 # CopyCop für das Waveshare RP2040-Keyboard-3
 
+<p align="center">
+  <img src="assets/branding/copycop-logo-512.png" alt="CopyCop-Logo" width="180" />
+</p>
+
 CopyCop speichert Text von Windows, macOS oder Linux und tippt ihn später an
 einem anderen Computer als normale USB-Tastatur. Es gibt keine automatische
 Ausgabe beim Einstecken: Jede Ausgabe muss an den drei physischen Tasten des
@@ -64,7 +68,7 @@ Die bisherige CLI bleibt erhalten und verwendet denselben plattformübergreifend
 Core:
 
 ```text
-ClipboardBridge [--replace-unsupported] [--part N] [--once]
+copycop-cli [--replace-unsupported] [--part N] [--once]
 ```
 
 Sie wartet auf C, bewertet Zeichen und Bytebelegung und fragt bei einem zu
@@ -96,7 +100,7 @@ benötigt.
 
 1. CopyCop abziehen.
 2. Mittlere Taste C gedrückt halten, einstecken und bei blauem Licht loslassen.
-3. CopyCop-GUI oder `ClipboardBridge` starten.
+3. CopyCop-GUI oder `copycop-cli` starten.
 4. Text in der GUI einfügen und auf „speichern“ klicken – oder Text normal
    kopieren und am Gerät C drücken.
 5. Nach der grünen Bestätigung abziehen.
@@ -159,9 +163,19 @@ Host-Projekte benötigen .NET 8 oder neuer:
 
 ```powershell
 dotnet build host/CopyCop.Gui/CopyCop.Gui.csproj -c Release
-dotnet build host/ClipboardBridge/ClipboardBridge.csproj -c Release
-dotnet run --project tests/ClipboardBridge.Tests -c Release
+dotnet build host/copycop-cli/copycop-cli.csproj -c Release
+dotnet run --project tests/CopyCop.Cli.Tests -c Release
 ```
+
+Alle fertigen Hostpakete inklusive Logo, eigenständiger GUI und `copycop-cli`
+lassen sich unter Windows reproduzierbar erzeugen:
+
+```powershell
+powershell -File host/packaging/publish.ps1
+```
+
+Die Ergebnisse liegen anschließend unter `host/release/packages/`; dieser
+generierte Ordner wird nicht in Git eingecheckt.
 
 Technische Details: [Architektur](docs/architecture.md),
 [Pinbelegung](docs/pinout.md), [Flash-Aufteilung](docs/flash-layout.md) und

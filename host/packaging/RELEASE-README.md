@@ -1,7 +1,7 @@
 # CopyCop Hostprogramme
 
 - `CopyCop` / `CopyCop.exe`: grafische Oberfläche ohne Konsolenfenster
-- `ClipboardBridge` / `ClipboardBridge.exe`: optionale Kommandozeile
+- `copycop-cli` / `copycop-cli.exe`: optionale Kommandozeile
 
 Das Quellgerät muss im blauen LOAD-Modus angeschlossen sein: CopyCop abziehen,
 mittlere C-Taste halten, USB einstecken und bei blauem Licht loslassen.

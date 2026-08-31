@@ -26,7 +26,7 @@ erhalten.
 
 ```text
 System-Zwischenablage (Windows, macOS oder Linux)
-    -> CopyCop-GUI oder ClipboardBridge-CLI
+    -> CopyCop-GUI oder copycop-cli
     -> gemeinsamer CopyCop.Core
     -> 64-Byte-HID-Protokoll im LOAD-Modus
     -> CRC-geprüfter A/B-Flash-Datensatz
@@ -90,4 +90,4 @@ Die Hostseite ist in drei Projekte getrennt:
 
 - `CopyCop.Core`: HID, Protokoll, CRC, Layout, Bewertung und Aufteilung
 - `CopyCop.Gui`: Avalonia-Desktopoberfläche für Windows, macOS und Linux
-- `ClipboardBridge`: plattformübergreifende Kommandozeile
+- `copycop-cli`: plattformübergreifende Kommandozeile

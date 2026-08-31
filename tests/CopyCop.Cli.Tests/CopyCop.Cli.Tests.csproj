@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyName>CopyCop.Cli.Tests</AssemblyName>
+    <RootNamespace>CopyCop.Cli.Tests</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\host\CopyCop.Core\CopyCop.Core.csproj" />

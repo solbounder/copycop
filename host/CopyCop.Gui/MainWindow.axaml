@@ -4,6 +4,7 @@
         x:Class="CopyCop.Gui.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="CopyCop"
+        Icon="/Assets/copycop.ico"
         Width="1180" Height="790"
         MinWidth="940" MinHeight="650"
         WindowStartupLocation="CenterScreen"
@@ -82,10 +83,8 @@
 
   <Grid RowDefinitions="Auto,*,Auto" Margin="28" RowSpacing="18">
     <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
-      <Border Width="48" Height="48" CornerRadius="15" Background="#5B7CFA">
-        <TextBlock Text="C" FontSize="24" FontWeight="Bold"
-                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-      </Border>
+      <Image Width="48" Height="48" Source="/Assets/copycop-logo.png"
+             Stretch="Uniform" />
       <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
         <TextBlock Text="COPYCOP" Classes="eyebrow" />
         <TextBlock Text="Portable Zwischenablage" FontSize="22" FontWeight="SemiBold" />

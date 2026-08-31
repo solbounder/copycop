@@ -12,6 +12,8 @@
   <string>local.copycop.app</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
+  <key>CFBundleIconFile</key>
+  <string>CopyCop.icns</string>
   <key>CFBundleName</key>
   <string>CopyCop</string>
   <key>CFBundlePackageType</key>

@@ -99,5 +99,5 @@ if (failures.Count > 0)
     return 1;
 }
 
-Console.WriteLine("Alle ClipboardBridge-Tests erfolgreich.");
+Console.WriteLine("Alle copycop-cli-Tests erfolgreich.");
 return 0;

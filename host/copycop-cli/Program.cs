@@ -3,7 +3,7 @@ using System.Text;
 using CopyCop.Core;
 using TextCopy;
 
-namespace CopyCop.ClipboardBridge;
+namespace CopyCop.Cli;
 
 internal static class Program
 {
@@ -204,7 +204,7 @@ internal static class Program
 
     private static void PrintHelp()
     {
-        Console.WriteLine("ClipboardBridge [--replace-unsupported] [--part N] [--once]");
+        Console.WriteLine("copycop-cli [--replace-unsupported] [--part N] [--once]");
         Console.WriteLine("  --replace-unsupported  unbekannte Zeichen durch ? ersetzen");
         Console.WriteLine("  --part N              bei zu großem Text genau Teil N speichern");
         Console.WriteLine("  --once                nach einem Ladeversuch beenden");

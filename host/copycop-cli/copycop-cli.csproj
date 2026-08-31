@@ -6,8 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <AssemblyName>ClipboardBridge</AssemblyName>
-    <RootNamespace>CopyCop.ClipboardBridge</RootNamespace>
+    <AssemblyName>copycop-cli</AssemblyName>
+    <RootNamespace>CopyCop.Cli</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\CopyCop.Core\CopyCop.Core.csproj" />

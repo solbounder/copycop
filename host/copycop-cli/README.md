@@ -1,10 +1,10 @@
-# ClipboardBridge CLI
+# copycop-cli
 
 Die CLI läuft unter Windows, macOS und Linux und besitzt dieselbe
 Kapazitäts-, Unicode-, Split- und HID-Logik wie die grafische CopyCop-App.
 
 ```text
-ClipboardBridge [--replace-unsupported] [--part N] [--once]
+copycop-cli [--replace-unsupported] [--part N] [--once]
 ```
 
 - `--replace-unsupported`: unbekannte Unicode-Zeichen als `?` speichern

@@ -16,4 +16,4 @@ Thumbs.db
 **/bin/
 **/obj/
 host/release/
-host/ClipboardBridge/release/
+host/copycop-cli/release/
