@@ -72,6 +72,9 @@ ausgewählten Text oder Teil auf dem Gerät. Erforderlich sind Android 8.0 oder
 neuer, USB-Host-Unterstützung und ein passendes OTG-Kabel beziehungsweise ein
 OTG-Adapter.
 
+Eine vorgebaute, lokal debug-signierte APK zum direkten Installieren liegt
+unter [`dist/android/CopyCop-Android.apk`](dist/android/CopyCop-Android.apk).
+
 Solange die App im Vordergrund ist, funktioniert auch die physische C-Taste zum
 Übernehmen und direkten Speichern der Android-Zwischenablage. Im Hintergrund
 blockiert Android den allgemeinen Zwischenablagezugriff; die App weist dann auf
