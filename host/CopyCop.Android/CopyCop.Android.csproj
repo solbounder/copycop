@@ -8,8 +8,8 @@
     <RootNamespace>CopyCop.AndroidApp</RootNamespace>
     <ApplicationId>de.copycop.app</ApplicationId>
     <ApplicationTitle>CopyCop</ApplicationTitle>
-    <ApplicationVersion>1</ApplicationVersion>
-    <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
+    <ApplicationVersion>2</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0.1</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidUseAapt2>true</AndroidUseAapt2>
   </PropertyGroup>

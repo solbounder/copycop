@@ -126,7 +126,7 @@ internal sealed class AndroidUsbTransport : IProtocolTransport
     private ProtocolFrame ReadFrame(CancellationToken cancellationToken)
     {
         var packet = new byte[ProtocolFrame.Size];
-        using var buffer = ByteBuffer.Wrap(packet);
+        using var buffer = ByteBuffer.AllocateDirect(ProtocolFrame.Size);
         using var request = new UsbRequest();
         if (!request.Initialize(connection, inputEndpoint))
             throw new IOException("Der USB-Leseendpunkt konnte nicht initialisiert werden.");
@@ -156,7 +156,19 @@ internal sealed class AndroidUsbTransport : IProtocolTransport
                 if (bytesRead != ProtocolFrame.Size)
                     throw new IOException(
                         $"USB-Eingabe unvollständig: {bytesRead} von {ProtocolFrame.Size} Bytes.");
-                return ProtocolFrame.Parse(packet);
+
+                buffer.Flip();
+                buffer.Get(packet, 0, bytesRead);
+                try
+                {
+                    return ProtocolFrame.Parse(packet);
+                }
+                catch (InvalidDataException exception)
+                {
+                    var prefix = Convert.ToHexString(packet.AsSpan(0, 8));
+                    throw new InvalidDataException(
+                        $"{exception.Message} USB-Anfang: {prefix}.", exception);
+                }
             }
         }
         finally

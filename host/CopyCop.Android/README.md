@@ -45,5 +45,5 @@ direktes Sideloading gedacht, nicht für Google Play.
 
 Der USB-Transport verwendet Androids `UsbManager`, übernimmt die HID-
 Schnittstelle exklusiv, sendet HID-Output-Reports über `SET_REPORT` und liest
-den Interrupt-IN-Endpunkt asynchron. Die Firmware muss dafür nicht geändert
-werden.
+den Interrupt-IN-Endpunkt asynchron in einen direkten Java-USB-Puffer. Die
+Firmware muss dafür nicht geändert werden.
