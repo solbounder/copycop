@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-feature android:name="android.hardware.usb.host" android:required="true" />
+  <application
+      android:allowBackup="false"
+      android:label="CopyCop"
+      android:icon="@drawable/copycop_logo"
+      android:theme="@style/AppTheme"
+      android:usesCleartextTraffic="false" />
+</manifest>

@@ -11,6 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\CopyCop.Core\CopyCop.Core.csproj" />
+    <ProjectReference Include="..\CopyCop.Hid\CopyCop.Hid.csproj" />
     <PackageReference Include="TextCopy" Version="6.2.1" />
   </ItemGroup>
 </Project>

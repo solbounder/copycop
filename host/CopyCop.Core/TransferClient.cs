@@ -12,7 +12,7 @@ public sealed record DeviceInfo(
 
 public sealed class TransferClient : IAsyncDisposable
 {
-    private readonly CopyCopDevice device;
+    private readonly IProtocolTransport device;
     private readonly CancellationTokenSource lifetime = new();
     private readonly ConcurrentDictionary<uint, TaskCompletionSource<ProtocolFrame>> pending = new();
     private readonly Channel<ProtocolFrame> copyEvents = Channel.CreateUnbounded<ProtocolFrame>(
@@ -21,7 +21,7 @@ public sealed class TransferClient : IAsyncDisposable
     private readonly Task readerTask;
     private uint sequence;
 
-    public TransferClient(CopyCopDevice device)
+    public TransferClient(IProtocolTransport device)
     {
         this.device = device;
         readerTask = ReadLoopAsync();

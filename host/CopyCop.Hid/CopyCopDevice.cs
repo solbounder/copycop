@@ -1,8 +1,9 @@
+using CopyCop.Core;
 using HidSharp;
 
-namespace CopyCop.Core;
+namespace CopyCop.Hid;
 
-public sealed class CopyCopDevice : IAsyncDisposable
+public sealed class CopyCopDevice : IProtocolTransport
 {
     public const int VendorId = 0xCAFE;
     public const int LoadProductId = 0x4031;

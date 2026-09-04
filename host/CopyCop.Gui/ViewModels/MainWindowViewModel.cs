@@ -3,6 +3,7 @@ using System.Text;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CopyCop.Core;
+using CopyCop.Hid;
 
 namespace CopyCop.Gui.ViewModels;
 

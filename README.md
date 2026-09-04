@@ -63,6 +63,20 @@ Die GUI kann für diese Zielsysteme veröffentlicht werden:
 - `osx-x64/` für Intel-Macs
 - `osx-arm64/` für Apple-Silicon-Macs
 
+### Android-App
+
+Die Android-App übernimmt dieselbe Textprüfung, Aufteilung und Tippdauer-
+Berechnung wie die Desktop-GUI. Sie verbindet CopyCop im blauen LOAD-Modus
+direkt per USB-Host/OTG, fragt Androids USB-Berechtigung ab und speichert den
+ausgewählten Text oder Teil auf dem Gerät. Erforderlich sind Android 8.0 oder
+neuer, USB-Host-Unterstützung und ein passendes OTG-Kabel beziehungsweise ein
+OTG-Adapter.
+
+Solange die App im Vordergrund ist, funktioniert auch die physische C-Taste zum
+Übernehmen und direkten Speichern der Android-Zwischenablage. Im Hintergrund
+blockiert Android den allgemeinen Zwischenablagezugriff; die App weist dann auf
+die manuelle Übernahme hin.
+
 ### Kommandozeile
 
 Die bisherige CLI bleibt erhalten und verwendet denselben plattformübergreifenden
@@ -186,6 +200,17 @@ dotnet build host/CopyCop.Gui/CopyCop.Gui.csproj -c Release
 dotnet build host/copycop-cli/copycop-cli.csproj -c Release
 dotnet run --project tests/CopyCop.Cli.Tests -c Release
 ```
+
+Für Android werden zusätzlich die .NET-Android-Workload und ein Android-SDK
+benötigt. Ein lokal installierbares APK entsteht mit:
+
+```powershell
+powershell -File host/packaging/publish-android.ps1
+```
+
+Das Ergebnis liegt unter `host/release/android/CopyCop-Android.apk`. Details zur
+Benutzung, Signierung und USB-Verbindung stehen in
+[`host/CopyCop.Android/README.md`](host/CopyCop.Android/README.md).
 
 Alle fertigen Hostpakete inklusive Logo, eigenständiger GUI und `copycop-cli`
 lassen sich unter Windows reproduzierbar erzeugen:

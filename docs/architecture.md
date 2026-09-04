@@ -31,8 +31,8 @@ Modifier behalten den schnellen normalen Ablauf.
 ## Datenfluss
 
 ```text
-System-Zwischenablage (Windows, macOS oder Linux)
-    -> CopyCop-GUI oder copycop-cli
+System-Zwischenablage (Windows, macOS, Linux oder Android)
+    -> CopyCop-GUI, Android-App oder copycop-cli
     -> gemeinsamer CopyCop.Core
     -> 64-Byte-HID-Protokoll im LOAD-Modus
     -> CRC-geprüfter A/B-Flash-Datensatz
@@ -41,9 +41,11 @@ System-Zwischenablage (Windows, macOS oder Linux)
     -> deutsches QWERTZ am Ziel-PC
 ```
 
-Die GUI basiert auf Avalonia und läuft ohne Konsolenfenster. Die CLI bleibt als
-separates Programm verfügbar. Beide verwenden HidSharp für den
-plattformübergreifenden HID-Zugriff und exakt dieselbe Textanalyse. Die GUI
+Die Desktop-GUI basiert auf Avalonia und läuft ohne Konsolenfenster. Die CLI
+bleibt als separates Programm verfügbar. Beide verwenden `CopyCop.Hid` mit
+HidSharp für den plattformübergreifenden Desktop-HID-Zugriff. Die native
+Android-App verwendet stattdessen Androids USB-Host-API. Alle Oberflächen
+verwenden denselben transportneutralen Core und exakt dieselbe Textanalyse. Die GUI
 bewertet Zeichen, UTF-8-Bytes und Auslastung live. `TextSplitter` zerlegt zu
 großen Text ohne Datenverlust, ohne Surrogate zu trennen, bevorzugt an
 Zeilen- und Wortgrenzen.
@@ -98,8 +100,10 @@ dabei nie als die Zeichen C oder V an USB weitergegeben.
 Die Firmware läuft einkernig und ereignisgesteuert. Flash-Zugriffe verwenden
 `flash_safe_execute`; ein Watchdog überwacht den Hauptloop.
 
-Die Hostseite ist in drei Projekte getrennt:
+Die Hostseite ist in fünf Projekte getrennt:
 
-- `CopyCop.Core`: HID, Protokoll, CRC, Layout, Bewertung, Aufteilung und Tippdauer
+- `CopyCop.Core`: transportneutrales Protokoll, CRC, Layout, Bewertung, Aufteilung und Tippdauer
+- `CopyCop.Hid`: HidSharp-Transport für Windows, macOS und Linux
 - `CopyCop.Gui`: Avalonia-Desktopoberfläche für Windows, macOS und Linux
+- `CopyCop.Android`: native Android-Oberfläche und USB-Host-Transport
 - `copycop-cli`: plattformübergreifende Kommandozeile

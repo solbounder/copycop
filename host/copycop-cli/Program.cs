@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using CopyCop.Core;
+using CopyCop.Hid;
 using TextCopy;
 
 namespace CopyCop.Cli;
