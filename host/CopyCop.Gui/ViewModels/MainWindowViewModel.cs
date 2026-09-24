@@ -17,6 +17,13 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
 
     private readonly Func<Task<string?>> readClipboard;
     private readonly Func<CancellationToken, Task<(string Name, string Text)?>> readTextFile;
+    private readonly Func<CancellationToken, Task<IReadOnlyList<BundleFile>?>>? readBundleFiles;
+    private readonly Func<CancellationToken, Task<IReadOnlyList<BundleFile>?>>? readBundleFolder;
+    private readonly BundleFileSelection fileSelection = new();
+    private BundleFile? selectedBundleFile;
+    private bool selectionNeedsBuild;
+    private readonly Func<string, CancellationToken, Task<string?>>? saveBundle;
+    private bool compressBundle = true;
     private bool isReadingInput;
     private readonly CancellationTokenSource lifetime = new();
     private CancellationTokenSource? transferCancellation;
@@ -39,25 +46,71 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     private bool hasTypingEstimate;
 
     public MainWindowViewModel(Func<Task<string?>> readClipboard,
-        Func<CancellationToken, Task<(string Name, string Text)?>> readTextFile)
+        Func<CancellationToken, Task<(string Name, string Text)?>> readTextFile,
+        Func<CancellationToken, Task<IReadOnlyList<BundleFile>?>>? readBundleFiles = null,
+        Func<string, CancellationToken, Task<string?>>? saveBundle = null,
+        Func<CancellationToken, Task<IReadOnlyList<BundleFile>?>>? readBundleFolder = null)
     {
         this.readClipboard = readClipboard;
         this.readTextFile = readTextFile;
+        this.readBundleFiles = readBundleFiles;
+        this.readBundleFolder = readBundleFolder;
+        this.saveBundle = saveBundle;
         assessment = TextCapacity.Assess(string.Empty, false);
         UpdateTypingEstimate();
         PasteClipboardCommand = new AsyncRelayCommand(PasteClipboardAsync, () => IsIdle);
         OpenFileCommand = new AsyncRelayCommand(OpenFileAsync, () => IsIdle);
+        BundleFilesCommand = new AsyncRelayCommand(() => AddBundleFilesAsync(this.readBundleFiles),
+            () => IsIdle && this.readBundleFiles is not null);
+        BundleFolderCommand = new AsyncRelayCommand(() => AddBundleFilesAsync(this.readBundleFolder),
+            () => IsIdle && this.readBundleFolder is not null);
+        BuildBundleCommand = new AsyncRelayCommand(BuildBundleAsync, () => IsIdle && HasBundleFiles);
+        RemoveBundleFileCommand = new RelayCommand(() =>
+        {
+            if (SelectedBundleFile is { } file && fileSelection.Remove(file.Name)) RefreshFileSelection(changed: true);
+        }, () => IsIdle && SelectedBundleFile is not null);
+        ClearBundleFilesCommand = new RelayCommand(() =>
+        {
+            fileSelection.Clear();
+            RefreshFileSelection(changed: true);
+        }, () => IsIdle && HasBundleFiles);
+        SaveBundleCommand = new AsyncRelayCommand(SaveBundleAsync,
+            () => IsIdle && !selectionNeedsBuild && Text.Length > 0 && this.saveBundle is not null);
         SplitCommand = new RelayCommand(SplitText, () => IsIdle && NeedsSplit && !HasBlockingUnsupported);
         SendCommand = new AsyncRelayCommand(SendSelectedAsync, () => CanSend);
         CancelCommand = new RelayCommand(CancelTransfer, () => IsBusy);
     }
 
     public ObservableCollection<TextPart> Parts { get; } = [];
+    public ObservableCollection<BundleFile> BundleFiles { get; } = [];
+    public bool HasBundleFiles => BundleFiles.Count > 0;
+    public string BundleSelectionSummary => $"{BundleFiles.Count} Dateien · {fileSelection.TotalBytes:N0} Bytes"
+        + (selectionNeedsBuild ? " · Paket neu erstellen" : "");
+    public BundleFile? SelectedBundleFile
+    {
+        get => selectedBundleFile;
+        set { if (SetProperty(ref selectedBundleFile, value)) NotifyCommands(); }
+    }
     public AsyncRelayCommand PasteClipboardCommand { get; }
     public AsyncRelayCommand OpenFileCommand { get; }
+    public AsyncRelayCommand BundleFilesCommand { get; }
+    public AsyncRelayCommand BundleFolderCommand { get; }
+    public AsyncRelayCommand BuildBundleCommand { get; }
+    public RelayCommand RemoveBundleFileCommand { get; }
+    public RelayCommand ClearBundleFilesCommand { get; }
+    public AsyncRelayCommand SaveBundleCommand { get; }
     public RelayCommand SplitCommand { get; }
     public AsyncRelayCommand SendCommand { get; }
     public RelayCommand CancelCommand { get; }
+
+    public bool CompressBundle
+    {
+        get => compressBundle;
+        set
+        {
+            if (SetProperty(ref compressBundle, value) && HasBundleFiles) RefreshFileSelection(changed: true);
+        }
+    }
 
     public string Text
     {
@@ -231,7 +284,7 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         ? "Text auf CopyCop speichern"
         : $"Teil {SelectedPart.Number} auf CopyCop speichern";
 
-    public bool CanSend => IsConnected && IsIdle && assessment.HasText
+    public bool CanSend => IsConnected && IsIdle && !selectionNeedsBuild && assessment.HasText
         && !HasBlockingUnsupported
         && (assessment.FitsCapacity || SelectedPart is not null);
 
@@ -313,6 +366,13 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         {
             var file = await readTextFile(lifetime.Token);
             if (file is null || lifetime.IsCancellationRequested) return;
+            IReadOnlyList<BundleFile> loadedFiles = [];
+            if (Path.GetExtension(file.Value.Name).Equals(".copycop", StringComparison.OrdinalIgnoreCase)
+                || CopyCopBundle.LooksLikeBundle(file.Value.Text))
+                loadedFiles = await Task.Run(() => CopyCopBundle.Read(file.Value.Text), lifetime.Token);
+            if (lifetime.IsCancellationRequested) return;
+            fileSelection.Replace(loadedFiles);
+            RefreshFileSelection(changed: false);
             // Invalidate an old part selection even when the new file has identical content.
             if (Text == file.Value.Text) Reassess(clearParts: true);
             else Text = file.Value.Text;
@@ -339,6 +399,116 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         }
     }
 
+    private void RefreshFileSelection(bool changed)
+    {
+        var selectedName = selectedBundleFile?.Name;
+        BundleFiles.Clear();
+        foreach (var file in fileSelection.Files) BundleFiles.Add(file);
+        selectedBundleFile = BundleFiles.FirstOrDefault(file => file.Name == selectedName) ?? BundleFiles.FirstOrDefault();
+        selectionNeedsBuild = changed && HasBundleFiles;
+        if (changed && CopyCopBundle.LooksLikeBundle(Text)) Text = string.Empty;
+        OnPropertyChanged(nameof(HasBundleFiles));
+        OnPropertyChanged(nameof(SelectedBundleFile));
+        OnPropertyChanged(nameof(BundleSelectionSummary));
+        NotifyCommands();
+    }
+
+    private async Task AddBundleFilesAsync(Func<CancellationToken, Task<IReadOnlyList<BundleFile>?>>? picker)
+    {
+        if (picker is null) return;
+        isReadingInput = true;
+        OnPropertyChanged(nameof(IsIdle));
+        NotifyCommands();
+        try
+        {
+            var files = await picker(lifetime.Token);
+            if (files is null || lifetime.IsCancellationRequested) return;
+            var added = fileSelection.Add(files);
+            if (added > 0) RefreshFileSelection(changed: true);
+            ActivityText = added == 0 ? "Die ausgewählten Dateien sind bereits in der Liste."
+                : $"{added} Dateien hinzugefügt. Die bisherigen bleiben erhalten. Jetzt Paket erstellen.";
+            ActivityBrush = Blue;
+        }
+        catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+        catch (Exception exception)
+        {
+            ActivityText = $"Dateien konnten nicht hinzugefügt werden: {exception.Message}";
+            ActivityBrush = Red;
+        }
+        finally
+        {
+            isReadingInput = false;
+            OnPropertyChanged(nameof(IsIdle));
+            NotifyCommands();
+        }
+    }
+
+    private async Task BuildBundleAsync()
+    {
+        isReadingInput = true;
+        OnPropertyChanged(nameof(IsIdle));
+        NotifyCommands();
+        try
+        {
+            var files = fileSelection.Files.ToArray();
+            var compress = CompressBundle;
+            var bundle = await Task.Run(() => CopyCopBundle.Create(files, compress), lifetime.Token);
+            if (lifetime.IsCancellationRequested) return;
+            RefreshFileSelection(changed: false);
+            if (Text == bundle.Text) Reassess(clearParts: true);
+            else Text = bundle.Text;
+            if (NeedsSplit) SplitText();
+            var saved = bundle.UncompressedArchiveBytes - bundle.ArchiveBytes;
+            ActivityText = $"{bundle.FileCount} Dateien gebündelt · {bundle.OriginalBytes:N0} Original-Bytes · "
+                + $"{Text.Length:N0} Tippzeichen · {saved:N0} ZIP-Bytes durch Kompression gespart. "
+                + "Als .copycop speichern oder auf das Gerät laden. Am Ziel mit copycop.html entpacken.";
+            ActivityBrush = Green;
+        }
+        catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+        catch (Exception exception)
+        {
+            ActivityText = $"Dateien konnten nicht gebündelt werden: {exception.Message}";
+            ActivityBrush = Red;
+        }
+        finally
+        {
+            isReadingInput = false;
+            OnPropertyChanged(nameof(IsIdle));
+            NotifyCommands();
+        }
+    }
+
+    private async Task SaveBundleAsync()
+    {
+        if (saveBundle is null) return;
+        isReadingInput = true;
+        OnPropertyChanged(nameof(IsIdle));
+        NotifyCommands();
+        try
+        {
+            var source = Text;
+            var compress = CompressBundle;
+            var contents = await Task.Run(() => CopyCopBundle.PrepareForSave(source, compress), lifetime.Token);
+            lifetime.Token.ThrowIfCancellationRequested();
+            var name = await saveBundle(contents, lifetime.Token);
+            if (name is null || lifetime.IsCancellationRequested) return;
+            ActivityText = $"„{name}“ gespeichert. Das vollständige Paket kann später wieder geöffnet werden.";
+            ActivityBrush = Green;
+        }
+        catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+        catch (Exception exception)
+        {
+            ActivityText = $"Paket konnte nicht gespeichert werden: {exception.Message}";
+            ActivityBrush = Red;
+        }
+        finally
+        {
+            isReadingInput = false;
+            OnPropertyChanged(nameof(IsIdle));
+            NotifyCommands();
+        }
+    }
+
     private async Task<bool> PasteClipboardAsync()
     {
         isReadingInput = true;
@@ -354,6 +524,8 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
                 return false;
             }
             Text = clipboard;
+            fileSelection.Clear();
+            RefreshFileSelection(changed: false);
             ActivityText = assessment.FitsCapacity
                 ? "Zwischenablage eingefügt und geprüft."
                 : $"Zwischenablage benötigt {assessment.RequiredParts:N0} Teile.";
@@ -502,6 +674,12 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     {
         PasteClipboardCommand.RaiseCanExecuteChanged();
         OpenFileCommand.RaiseCanExecuteChanged();
+        BundleFilesCommand.RaiseCanExecuteChanged();
+        BundleFolderCommand.RaiseCanExecuteChanged();
+        BuildBundleCommand.RaiseCanExecuteChanged();
+        RemoveBundleFileCommand.RaiseCanExecuteChanged();
+        ClearBundleFilesCommand.RaiseCanExecuteChanged();
+        SaveBundleCommand.RaiseCanExecuteChanged();
         SplitCommand.RaiseCanExecuteChanged();
         SendCommand.RaiseCanExecuteChanged();
         CancelCommand.RaiseCanExecuteChanged();

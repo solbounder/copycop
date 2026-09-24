@@ -120,7 +120,25 @@
                   <TextBlock Text="Aus Zwischenablage" />
                 </StackPanel>
               </Button>
+              <Button Classes="secondary" Command="{Binding BundleFilesCommand}"
+                      Content="Dateien hinzufügen …" Margin="8,0,8,6" />
+              <Button Classes="secondary" Command="{Binding BundleFolderCommand}"
+                      Content="Ordner hinzufügen …" Margin="0,0,8,6" />
+              <Button Classes="secondary" Command="{Binding SaveBundleCommand}"
+                      Content="Als .copycop speichern …" Margin="0,0,0,6" />
             </WrapPanel>
+            <StackPanel IsVisible="{Binding HasBundleFiles}" Spacing="6">
+              <TextBlock Text="{Binding BundleSelectionSummary}" FontSize="12" Classes="muted" />
+              <ListBox ItemsSource="{Binding BundleFiles}" SelectedItem="{Binding SelectedBundleFile}"
+                       IsEnabled="{Binding IsIdle}" Height="90" FontSize="12" />
+              <WrapPanel>
+                <Button Classes="secondary" Content="Datei entfernen" Command="{Binding RemoveBundleFileCommand}" Margin="0,0,8,6" />
+                <Button Classes="secondary" Content="Auswahl leeren" Command="{Binding ClearBundleFilesCommand}" Margin="0,0,8,6" />
+                <Button Classes="primary" Content="Paket erstellen" Command="{Binding BuildBundleCommand}" Margin="0,0,0,6" />
+              </WrapPanel>
+            </StackPanel>
+            <CheckBox Content="Neue Pakete komprimieren, wenn sie dadurch kleiner werden"
+                      IsChecked="{Binding CompressBundle}" IsEnabled="{Binding IsIdle}" FontSize="12" />
           </StackPanel>
 
           <TextBox Grid.Row="1" Classes="editor"
@@ -219,7 +237,7 @@
               <TextBlock Text="TEXT AUFTEILEN" Classes="eyebrow" />
               <TextBlock Text="{Binding SplitSummary}" FontSize="14" FontWeight="SemiBold"
                          TextWrapping="Wrap" />
-              <TextBlock Text="Unicode-sicher an Zeilen- oder Wortgrenzen. Auf dem Gerät wird jeweils nur der ausgewählte Teil gespeichert."
+              <TextBlock Text="CopyCop-Pakete erhalten nummerierte Teile mit Prüfsumme, normaler Text wird an Zeilen- oder Wortgrenzen geteilt. Auf dem Gerät wird jeweils nur der ausgewählte Teil gespeichert."
                          Classes="muted" FontSize="11" TextWrapping="Wrap" LineHeight="16" />
               <Button Classes="secondary" Command="{Binding SplitCommand}"
                       HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"

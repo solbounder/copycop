@@ -23,3 +23,13 @@ Startmodi, Geschwindigkeitsfarben und weiteren LED-Signale direkt in der GUI.
 Im Normalmodus ändern Strg und C das Tempo auch während CopyCop gerade tippt.
 V pausiert beziehungsweise setzt mit kurzem Druck fort; etwa 0,8 Sekunden
 Haltedauer brechen die Ausgabe vollständig ab.
+
+## .copycop-Dateipakete
+
+Mit „Dateien hinzufügen …“ oder „Ordner hinzufügen …“ die Dateiliste Schritt
+für Schritt ergänzen. „Paket erstellen“ bündelt die aktuelle Auswahl mit
+optionaler Kompression; „Als .copycop speichern …“ legt sie ab. Auf dem Zielrechner die
+beiliegende `copycop.html` öffnen, alle Teile im Empfangsfeld tippen lassen und
+„Prüfen & entpacken“ wählen. Die HTML-Datei ist ausschließlich der Empfänger
+und funktioniert lokal ohne Upload. Dieselbe Dateiverwaltung bietet die Android-App.
+Die CLI kann mit `pack` und `unpack` ebenfalls Pakete erstellen und entpacken.

@@ -22,6 +22,14 @@ public static class TextSplitter
         if (maximumBytes <= 0) throw new ArgumentOutOfRangeException(nameof(maximumBytes));
         if (text.Length == 0) return [];
 
+        if (CopyCopBundle.LooksLikeBundle(text))
+        {
+            try { return CopyCopBundle.SplitForTransfer(text, maximumBytes); }
+            // The live editor may contain an incomplete frame while the user is typing.
+            catch (InvalidDataException) { }
+            catch (ArgumentOutOfRangeException) { }
+        }
+
         var units = new List<Unit>();
         var characterStart = 0;
         var byteEnd = 0;

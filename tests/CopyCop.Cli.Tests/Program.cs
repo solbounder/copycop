@@ -112,6 +112,7 @@ foreach (var fixture in fixtures)
     Check(UnicodeAnalyzer.Analyze(fixture, false).Unsupported.Count == 0, $"fixture: {fixture[..Math.Min(12, fixture.Length)]}");
 
 await FileImportTests.RunAsync(Check);
+await BundleTests.RunAsync(Check);
 
 if (failures.Count > 0)
 {

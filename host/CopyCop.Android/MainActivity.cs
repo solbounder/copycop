@@ -24,7 +24,7 @@ namespace CopyCop.AndroidApp;
                            | global::Android.Content.PM.ConfigChanges.UiMode)]
 [IntentFilter(new[] { UsbManager.ActionUsbDeviceAttached })]
 [MetaData(UsbManager.ActionUsbDeviceAttached, Resource = "@xml/copycop_device_filter")]
-public sealed class MainActivity : Activity
+public sealed partial class MainActivity : Activity
 {
     private const string UsbPermissionAction = "de.copycop.app.USB_PERMISSION";
     private const int OpenTextFileRequest = 1001;
@@ -68,6 +68,15 @@ public sealed class MainActivity : Activity
     private Button sendButton = null!;
     private Button cancelButton = null!;
     private Button openFileButton = null!;
+    private Button bundleFilesButton = null!;
+    private Button bundleFolderButton = null!;
+    private Button saveBundleButton = null!;
+    private Button buildBundleButton = null!;
+    private Button removeBundleFileButton = null!;
+    private Button clearBundleFilesButton = null!;
+    private TextView bundleSelectionSummary = null!;
+    private Spinner bundleFilesSpinner = null!;
+    private CheckBox compressBundle = null!;
     private Button clipboardButton = null!;
     private Spinner partsSpinner = null!;
 
@@ -94,6 +103,7 @@ public sealed class MainActivity : Activity
         filePickerPending = savedInstanceState?.GetBoolean(FilePickerPendingState) ?? false;
         isImporting = filePickerPending;
         BuildUi();
+        RestoreFileState(savedInstanceState);
         usbReceiver = new UsbBroadcastReceiver(this);
         RegisterUsbReceiver();
         HandleUsbIntent(Intent);
@@ -104,99 +114,6 @@ public sealed class MainActivity : Activity
     {
         base.OnNewIntent(intent);
         HandleUsbIntent(intent);
-    }
-
-    protected override void OnSaveInstanceState(Bundle outState)
-    {
-        outState.PutBoolean(FilePickerPendingState, filePickerPending);
-        base.OnSaveInstanceState(outState);
-    }
-
-    private void OpenTextFile()
-    {
-        if (isBusy || isImporting) return;
-        isImporting = true;
-        filePickerPending = true;
-        UpdateActionState();
-        try
-        {
-            using var intent = new Intent(Intent.ActionOpenDocument);
-            intent.AddCategory(Intent.CategoryOpenable);
-            // Source files are often reported as application/* rather than text/*.
-            // Validate their contents with the shared reader instead of filtering by MIME type.
-            intent.SetType("*/*");
-            intent.PutExtra(Intent.ExtraAllowMultiple, false);
-            intent.AddFlags(ActivityFlags.GrantReadUriPermission);
-            StartActivityForResult(intent, OpenTextFileRequest);
-        }
-        catch (Exception exception)
-        {
-            filePickerPending = false;
-            isImporting = false;
-            UpdateActionState();
-            SetActivity($"Dateiauswahl konnte nicht geöffnet werden: {exception.Message}", Red);
-        }
-    }
-
-    protected override async void OnActivityResult(int requestCode, Result resultCode, Intent? data)
-    {
-        base.OnActivityResult(requestCode, resultCode, data);
-        if (requestCode != OpenTextFileRequest || lifetime.IsCancellationRequested) return;
-
-        filePickerPending = false;
-        isImporting = true;
-        UpdateActionState();
-        try
-        {
-            if (resultCode != Result.Ok) return;
-            var uri = data?.Data ?? throw new IOException("Es wurde keine Datei zurückgegeben.");
-            var resolver = ContentResolver ?? throw new IOException("Der Dateizugriff ist nicht verfügbar.");
-            var cancellationToken = lifetime.Token;
-            SetActivity("Textdatei wird eingelesen …", Primary);
-
-            // Document providers may perform blocking disk or network I/O even when opening a stream.
-            var file = await Task.Run(async () =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var name = "Textdatei";
-                using (var cursor = resolver.Query(uri,
-                    [global::Android.Provider.IOpenableColumns.DisplayName], null, null, null))
-                {
-                    var column = cursor?.GetColumnIndex(global::Android.Provider.IOpenableColumns.DisplayName) ?? -1;
-                    if (column >= 0 && cursor!.MoveToFirst())
-                        name = cursor.GetString(column) ?? name;
-                }
-                using var stream = resolver.OpenInputStream(uri)
-                    ?? throw new IOException("Die ausgewählte Datei konnte nicht geöffnet werden.");
-                var text = await TextFileReader.ReadAsync(stream, cancellationToken);
-                return (Name: name, Text: text);
-            }, cancellationToken);
-
-            if (cancellationToken.IsCancellationRequested) return;
-            // TextChanged reassesses changed content; identical content still clears old parts.
-            if (editor.Text == file.Text) Reassess(clearParts: true);
-            else editor.Text = file.Text;
-            editor.SetSelection(0);
-            var message = !assessment.HasText
-                ? $"„{file.Name}“ ist leer."
-                : assessment.HasBlockingUnsupported
-                    ? $"„{file.Name}“ eingelesen. Bitte nicht unterstützte Zeichen prüfen."
-                    : assessment.FitsCapacity
-                        ? $"„{file.Name}“ eingelesen und geprüft. Bereit zum Speichern."
-                        : $"„{file.Name}“ eingelesen. Bitte in {assessment.RequiredParts:N0} Teile aufteilen.";
-            SetActivity(message, assessment.CanTransfer ? Green : Amber);
-        }
-        catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
-        catch (Exception exception)
-        {
-            if (!lifetime.IsCancellationRequested)
-                SetActivity($"Datei konnte nicht eingelesen werden: {exception.Message}", Red);
-        }
-        finally
-        {
-            isImporting = false;
-            if (!lifetime.IsCancellationRequested) UpdateActionState();
-        }
     }
 
     protected override void OnResume()
@@ -530,6 +447,8 @@ public sealed class MainActivity : Activity
             }
 
             editor.Text = value;
+            fileSelection.Clear();
+            RefreshFileSelection(changed: false);
             editor.SetSelection(editor.Text?.Length ?? 0);
             SetActivity("Zwischenablage übernommen und geprüft.", Green);
 
@@ -548,9 +467,9 @@ public sealed class MainActivity : Activity
         }
     }
 
-    private void SplitText()
+    private void SplitText(bool afterImport = false)
     {
-        if (isBusy || isImporting) return;
+        if (isBusy || (isImporting && !afterImport)) return;
         if (!assessment.HasText || assessment.FitsCapacity || assessment.HasBlockingUnsupported) return;
 
         parts = TextSplitter.Split(assessment.Analysis.Text, maximumBytes);
@@ -686,6 +605,14 @@ public sealed class MainActivity : Activity
         if (sendButton is null) return;
         var isIdle = !isBusy && !isImporting;
         openFileButton.Enabled = isIdle;
+        bundleFilesButton.Enabled = isIdle;
+        bundleFolderButton.Enabled = isIdle;
+        saveBundleButton.Enabled = isIdle && !selectionNeedsBuild && !string.IsNullOrEmpty(editor.Text);
+        buildBundleButton.Enabled = isIdle && fileSelection.Files.Count > 0;
+        removeBundleFileButton.Enabled = isIdle && fileSelection.Files.Count > 0;
+        clearBundleFilesButton.Enabled = isIdle && fileSelection.Files.Count > 0;
+        bundleFilesSpinner.Enabled = isIdle;
+        compressBundle.Enabled = isIdle;
         clipboardButton.Enabled = isIdle;
         editor.Enabled = isIdle;
         replaceUnsupported.Enabled = isIdle;
@@ -694,7 +621,7 @@ public sealed class MainActivity : Activity
         var hasSelectedPart = partsSpinner.Visibility == ViewStates.Visible
                               && partsSpinner.SelectedItemPosition >= 0
                               && partsSpinner.SelectedItemPosition < parts.Count;
-        sendButton.Enabled = isConnected && isIdle && assessment.HasText
+        sendButton.Enabled = isConnected && isIdle && !selectionNeedsBuild && assessment.HasText
                              && !assessment.HasBlockingUnsupported
                              && (assessment.FitsCapacity || hasSelectedPart);
         sendButton.Alpha = sendButton.Enabled ? 1f : 0.45f;
@@ -778,15 +705,63 @@ public sealed class MainActivity : Activity
         root.AddView(connectionCard, WithBottomMargin(MatchWrap(), 14));
 
         var editorCard = Card(CardBackground);
-        editorCard.AddView(Eyebrow("TEXT"));
-        editorCard.AddView(Label("Text einlesen und prüfen", 19, TextPrimary, true),
+        editorCard.AddView(Eyebrow("TEXT & DATEIEN"));
+        editorCard.AddView(Label("Text oder Dateipaket vorbereiten", 19, TextPrimary, true),
             WithTopMargin(MatchWrap(), 3));
         openFileButton = Button("Datei öffnen …", Primary);
-        openFileButton.Click += (_, _) => OpenTextFile();
+        openFileButton.Click += (_, _) => OpenFilePicker(OpenTextFileRequest);
         editorCard.AddView(openFileButton, WithTopMargin(MatchWrap(), 12));
         clipboardButton = Button("Aus Zwischenablage übernehmen", Primary);
         clipboardButton.Click += async (_, _) => await PasteClipboardAsync(sendWhenPossible: false);
         editorCard.AddView(clipboardButton, WithTopMargin(MatchWrap(), 12));
+        bundleFilesButton = Button("Dateien hinzufügen …", Primary);
+        bundleFilesButton.Click += (_, _) => OpenFilePicker(BundleFilesRequest);
+        editorCard.AddView(bundleFilesButton, WithTopMargin(MatchWrap(), 12));
+        bundleFolderButton = Button("Ordner hinzufügen …", Primary);
+        bundleFolderButton.Click += (_, _) => OpenFilePicker(BundleFolderRequest);
+        editorCard.AddView(bundleFolderButton, WithTopMargin(MatchWrap(), 12));
+        bundleSelectionSummary = Label("Noch keine Dateien ausgewählt.", 13, Muted);
+        editorCard.AddView(bundleSelectionSummary, WithTopMargin(MatchWrap(), 8));
+        bundleFilesSpinner = new Spinner(this) { Visibility = ViewStates.Gone };
+        editorCard.AddView(bundleFilesSpinner, WithTopMargin(MatchWrap(), 6));
+        removeBundleFileButton = Button("Ausgewählte Datei entfernen", Amber);
+        removeBundleFileButton.Click += (_, _) =>
+        {
+            if (isBusy || isImporting) return;
+            var index = bundleFilesSpinner.SelectedItemPosition;
+            if (index >= 0 && index < fileSelection.Files.Count)
+            {
+                fileSelection.Remove(fileSelection.Files[index].Name);
+                RefreshFileSelection(changed: true);
+            }
+        };
+        editorCard.AddView(removeBundleFileButton, WithTopMargin(MatchWrap(), 6));
+        clearBundleFilesButton = Button("Auswahl leeren", Amber);
+        clearBundleFilesButton.Click += (_, _) =>
+        {
+            if (isBusy || isImporting) return;
+            fileSelection.Clear();
+            RefreshFileSelection(changed: true);
+        };
+        editorCard.AddView(clearBundleFilesButton, WithTopMargin(MatchWrap(), 6));
+        compressBundle = new CheckBox(this)
+        {
+            Text = "Neue Pakete komprimieren, wenn sie dadurch kleiner werden",
+            Checked = true
+        };
+        compressBundle.SetTextColor(TextPrimary);
+        compressBundle.ButtonTintList = ColorStateList.ValueOf(Primary);
+        editorCard.AddView(compressBundle, WithTopMargin(MatchWrap(), 8));
+        compressBundle.CheckedChange += (_, _) =>
+        {
+            if (fileSelection.Files.Count > 0) RefreshFileSelection(changed: true);
+        };
+        buildBundleButton = Button("Paket erstellen", Primary);
+        buildBundleButton.Click += async (_, _) => await BuildSelectedBundleAsync();
+        editorCard.AddView(buildBundleButton, WithTopMargin(MatchWrap(), 8));
+        saveBundleButton = Button("Als .copycop speichern …", Primary);
+        saveBundleButton.Click += async (_, _) => await SaveBundleAsync();
+        editorCard.AddView(saveBundleButton, WithTopMargin(MatchWrap(), 8));
 
         editor = new EditText(this)
         {
@@ -875,9 +850,10 @@ public sealed class MainActivity : Activity
         helpCard.AddView(Label(
             "1. CopyCop abziehen.\n"
             + "2. C am Gerät halten und per USB-OTG mit dem Handy verbinden.\n"
-            + "3. Datei öffnen oder Text übernehmen, prüfen und speichern.\n"
+            + "3. Text oder .copycop öffnen, Dateien bündeln und auf das Gerät speichern.\n"
             + "4. CopyCop abziehen und am Ziel-PC im grünen Modus einstecken.\n"
-            + "5. Cursor platzieren und V drücken.",
+            + "5. Für Pakete copycop.html öffnen, Cursor ins Empfangsfeld setzen und V drücken.\n"
+            + "6. Bei mehreren Teilen jeden einzeln laden und übertragen, dann entpacken.",
             13, Muted), WithTopMargin(MatchWrap(), 7));
         root.AddView(helpCard, WithBottomMargin(MatchWrap(), 14));
 

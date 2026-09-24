@@ -30,6 +30,31 @@ wenn der Text vollständig übertragbar ist. Android erlaubt Apps im Hintergrund
 keinen allgemeinen Zwischenablagezugriff; in diesem Fall fordert die App zum
 manuellen Öffnen auf.
 
+## Dateipakete vorbereiten
+
+**Dateien hinzufügen …** und **Ordner hinzufügen …** ergänzen die bestehende
+Dateiliste. Mehrfachauswahl ist optional: Mehrere nacheinander ausgewählte
+Einzeldateien bleiben gemeinsam in der Liste. Mit der Dateiliste und
+**Ausgewählte Datei entfernen** lässt sich gezielt ein Eintrag entfernen;
+**Auswahl leeren** beginnt eine neue Auswahl. Identische Dateien werden
+übersprungen, gleichnamige Dateien mit anderem Inhalt nicht überschrieben.
+
+**Paket erstellen** bündelt die Liste mit optionaler Kompression und bereitet
+nummerierte Geräteteile vor. **Als .copycop speichern …** öffnet den
+Android-Speicherdialog; **Datei öffnen …** lädt das Paket samt Dateiliste wieder,
+damit es ergänzt werden kann. Text im Editor lässt sich als enthaltene
+`text.txt` speichern. Änderungen an der Liste oder Kompression erfordern ein
+neues Paket; die vorherige Ausgabe wird dabei ungültig.
+
+Auswahl, Abbruch und Fehler erhalten die bisherigen Dateien. Bei einer vom
+System neu erstellten Activity bleibt der Zwischenstand in einem privaten
+temporären App-Cache erhalten. Die Systemdialoge benötigen keine pauschale
+Speicherberechtigung. Es gelten 256 Dateien, 16 MiB Originalinhalt und 4 MiB
+Übertragungstext pro Paket.
+
+Am Zielrechner dient `copycop.html` ausschließlich dem Empfang und Entpacken.
+Dateiverwaltung und Übertragung auf das Gerät bleiben in der App.
+
 ## Textdateien einlesen
 
 **Datei öffnen …** öffnet Androids Dateiauswahl, etwa für Dateien aus Downloads
@@ -50,7 +75,7 @@ dem Ziel-PC an. PDF-, Office- und Bilddateien werden nicht in Text umgewandelt.
 
 ## Bauen
 
-Erforderlich sind das .NET-8-SDK, die Android-Workload und ein Android-SDK:
+Erforderlich sind das .NET-10-SDK, die Android-Workload und ein Android-SDK:
 
 ```powershell
 dotnet workload install android

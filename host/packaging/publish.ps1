@@ -65,6 +65,7 @@ foreach ($runtimeIdentifier in $RuntimeIdentifiers) {
     Copy-Item -LiteralPath $cliSource -Destination (Join-Path $cliDirectory $cliName) -Force
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot "RELEASE-README.md") -Destination (Join-Path $packageDirectory "RELEASE-README.md") -Force
     Copy-Item -LiteralPath (Join-Path $repositoryRoot "host\THIRD-PARTY-NOTICES.md") -Destination (Join-Path $packageDirectory "THIRD-PARTY-NOTICES.md") -Force
+    Copy-Item -LiteralPath (Join-Path $repositoryRoot "web\copycop.html") -Destination (Join-Path $packageDirectory "copycop.html") -Force
 
     if ($targetIsMac) {
         $contentsDirectory = Join-Path $packageDirectory "CopyCop.app\Contents"

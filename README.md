@@ -48,6 +48,27 @@ Beim Einstecken wählt eine gehaltene Gerätetaste den Modus:
 
 ## Programme
 
+### Mehrere Dateien als .copycop-Paket
+
+**Dateien hinzufügen …** und **Ordner hinzufügen …** ergänzen in Desktop- und
+Android-App eine bestehende Dateiliste. Auch mehrere einzelne Auswahlen bleiben
+zusammen erhalten. Einzelne Dateien lassen sich entfernen; **Paket erstellen**
+bündelt die aktuelle Auswahl. Optionale ZIP-Kompression verkürzt den Übertragungstext,
+wenn die Dateien komprimierbar sind. **Als .copycop speichern …** speichert
+das ganze Paket zum späteren Wiederöffnen. Binärdaten, Dateinamen und originale
+Zeilenenden bleiben beim Wiederherstellen erhalten.
+
+Große Pakete werden in nummerierte, einzeln ladbare Geräteteile aufgeteilt.
+Auf dem Zielrechner nimmt die lokale [copycop.html](web/copycop.html) alle
+getippten Teile entgegen, prüft Vollständigkeit und Prüfsummen und bietet die
+wiederhergestellten Dateien einzeln oder als ZIP an. Die HTML-Seite dient nur
+zum Empfang und benötigt keinen Server oder Upload. Das Gerät hält
+weiterhin jeweils einen Teil; eine Firmwareänderung ist nicht erforderlich.
+
+CLI: `copycop-cli pack paket.copycop datei1.txt datei2.py` und
+`copycop-cli unpack paket.copycop neuer-zielordner` funktionieren ohne Gerät.
+Anleitung, Grenzen und Formatspezifikation: [.copycop-Dateiformat](docs/copycop-format.md).
+
 ### Grafische Oberfläche
 
 Die GUI läuft ohne Konsolenfenster und verbindet sich automatisch mit CopyCop
@@ -217,7 +238,7 @@ dotnet build host/copycop-cli/copycop-cli.csproj -c Release
 dotnet run --project tests/CopyCop.Cli.Tests -c Release
 ```
 
-Für Android werden zusätzlich die .NET-Android-Workload und ein Android-SDK
+Für Android werden das .NET-10-SDK, die passende Android-Workload und ein Android-SDK
 benötigt. Ein lokal installierbares APK entsteht mit:
 
 ```powershell

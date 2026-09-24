@@ -12,6 +12,8 @@ internal static class Program
 
     private static async Task<int> Main(string[] args)
     {
+        if (args.Length > 0 && args[0] is "pack" or "unpack")
+            return await BundleCommands.RunAsync(args);
         if (!TryParseOptions(args, out var options)) return 64;
         if (options is null) return 0;
 
@@ -29,6 +31,9 @@ internal static class Program
             {
                 await using var stream = File.OpenRead(options.FilePath);
                 fileText = await TextFileReader.ReadAsync(stream, cancellation.Token);
+                if (Path.GetExtension(options.FilePath).Equals(".copycop", StringComparison.OrdinalIgnoreCase)
+                    || CopyCopBundle.LooksLikeBundle(fileText))
+                    CopyCopBundle.Read(fileText);
                 if (fileText.Length == 0)
                 {
                     Console.Error.WriteLine("Die Datei ist leer.");
@@ -233,6 +238,8 @@ internal static class Program
     private static void PrintHelp()
     {
         Console.WriteLine("copycop-cli [--file PATH] [--replace-unsupported] [--part N] [--once]");
+        Console.WriteLine("copycop-cli pack OUTPUT.copycop INPUT... [--no-compress]");
+        Console.WriteLine("copycop-cli unpack INPUT.copycop NEW_DIRECTORY");
         Console.WriteLine("  --file PATH           Textdatei statt Zwischenablage verwenden; C startet das Speichern");
         Console.WriteLine("  --replace-unsupported  unbekannte Zeichen durch ? ersetzen");
         Console.WriteLine("  --part N              bei zu großem Text genau Teil N speichern");

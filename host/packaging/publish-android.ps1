@@ -37,7 +37,7 @@ if (-not [string]::IsNullOrWhiteSpace($SigningKeyStore)) {
     )
 }
 
-dotnet publish $project -c Release -f net8.0-android -o $publishDirectory @properties
+dotnet publish $project -c Release -f net10.0-android -o $publishDirectory @properties
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $signedApk = Get-ChildItem -LiteralPath $publishDirectory -Filter "*-Signed.apk" -File |

@@ -1,5 +1,20 @@
 # copycop-cli
 
+## Dateipakete ohne Gerät
+
+```text
+copycop-cli pack paket.copycop datei1.txt datei2.py [--no-compress]
+copycop-cli unpack paket.copycop neuer-zielordner
+```
+
+Mehrere Dateien werden samt Basisnamen bytegenau gebündelt, optional mit
+ZIP-Deflate komprimiert und als nummerierter ASCII-Text gespeichert. Die CLI
+überschreibt weder vorhandene Paketdateien noch bestehende Zielordner.
+Zum Empfangen im Browser liegt `web/copycop.html` bei. Details und Grenzen
+stehen in [`docs/copycop-format.md`](../../docs/copycop-format.md).
+
+## Text oder Paket auf CopyCop laden
+
 Die CLI läuft unter Windows, macOS und Linux und besitzt dieselbe
 Kapazitäts-, Unicode-, Split- und HID-Logik wie die grafische CopyCop-App.
 
