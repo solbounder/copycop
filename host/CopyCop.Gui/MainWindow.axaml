@@ -139,6 +139,10 @@
             </StackPanel>
             <CheckBox Content="Neue Pakete komprimieren, wenn sie dadurch kleiner werden"
                       IsChecked="{Binding CompressBundle}" IsEnabled="{Binding IsIdle}" FontSize="12" />
+            <CheckBox Content="Text komprimieren – Empfang über HTML"
+                      IsChecked="{Binding CompressText}" IsEnabled="{Binding IsIdle}" FontSize="12" />
+            <TextBlock Text="{Binding TextCompressionHint}" IsVisible="{Binding CompressText}"
+                       TextWrapping="Wrap" FontSize="12" Classes="muted" />
           </StackPanel>
 
           <TextBox Grid.Row="1" Classes="editor"
@@ -152,7 +156,7 @@
 
           <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
             <TextBlock Text="{Binding CharacterText}" Classes="muted" FontSize="12" />
-            <TextBlock Grid.Column="1" Text="Deutsches QWERTZ · CRLF wird normalisiert"
+            <TextBlock Grid.Column="1" Text="{Binding TransferModeText}"
                        Classes="muted" FontSize="12" HorizontalAlignment="Center" />
             <TextBlock Grid.Column="2" Text="{Binding ByteText}" Classes="muted" FontSize="12" />
           </Grid>

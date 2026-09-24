@@ -32,6 +32,16 @@ manuellen Öffnen auf.
 
 ## Dateipakete vorbereiten
 
+Für eingefügten oder eingelesenen Text gibt es außerdem **Text komprimieren –
+Empfang über HTML**. Der Haken ist standardmäßig aus. Eingeschaltet wird der
+Originaltext als `text.txt` verpackt, während er im Editor erhalten bleibt.
+Die Anzeige zeigt Paketgröße und Ersparnis oder Mehrbedarf. Speichern,
+Gerätetransfer, Aufteilung und Tippdauer verwenden die vorbereitete Fassung;
+auch die physische C-Taste beachtet den Haken. Am Ziel in `copycop.html`
+empfangen und entpacken. Für direktes Tippen in andere Apps oder zum Übertragen
+der selbstentpackenden Empfangs-HTML den Haken ausschalten. Die Einstellung
+bleibt bei einer Wiederherstellung der Activity erhalten.
+
 **Dateien hinzufügen …** und **Ordner hinzufügen …** ergänzen die bestehende
 Dateiliste. Mehrfachauswahl ist optional: Mehrere nacheinander ausgewählte
 Einzeldateien bleiben gemeinsam in der Liste. Mit der Dateiliste und

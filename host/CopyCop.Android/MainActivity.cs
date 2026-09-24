@@ -77,6 +77,9 @@ public sealed partial class MainActivity : Activity
     private TextView bundleSelectionSummary = null!;
     private Spinner bundleFilesSpinner = null!;
     private CheckBox compressBundle = null!;
+    private CheckBox compressText = null!;
+    private TextView textCompressionHint = null!;
+    private readonly TextTransferPreparation textPreparation = new();
     private Button clipboardButton = null!;
     private Spinner partsSpinner = null!;
 
@@ -536,10 +539,14 @@ public sealed partial class MainActivity : Activity
 
     private void Reassess(bool clearParts)
     {
+        var prepared = textPreparation.Prepare(editor.Text ?? string.Empty, compressText.Checked);
         assessment = TextCapacity.Assess(
-            editor.Text ?? string.Empty,
+            prepared.Text,
             replaceUnsupported.Checked,
             maximumBytes);
+        textCompressionHint.Text = prepared.Hint;
+        textCompressionHint.Visibility = compressText.Checked ? ViewStates.Visible : ViewStates.Gone;
+        textCompressionHint.SetTextColor(prepared.Error is null ? Muted : Red);
 
         if (clearParts)
         {
@@ -548,10 +555,10 @@ public sealed partial class MainActivity : Activity
             partsSpinner.Visibility = ViewStates.Gone;
         }
 
-        var headlineColor = !assessment.HasText ? Muted
+        var headlineColor = prepared.Error is not null ? Red : !assessment.HasText ? Muted
             : assessment.HasBlockingUnsupported ? Red
             : assessment.FitsCapacity ? Green : Amber;
-        capacityTitle.Text = !assessment.HasText ? "Noch kein Text"
+        capacityTitle.Text = prepared.Error is not null ? "Kompression fehlgeschlagen" : !assessment.HasText ? "Noch kein Text"
             : assessment.HasBlockingUnsupported ? "Nicht unterstützte Zeichen"
             : assessment.FitsCapacity ? "Passt vollständig"
             : $"Text benötigt {assessment.RequiredParts:N0} Teile";
@@ -607,12 +614,14 @@ public sealed partial class MainActivity : Activity
         openFileButton.Enabled = isIdle;
         bundleFilesButton.Enabled = isIdle;
         bundleFolderButton.Enabled = isIdle;
-        saveBundleButton.Enabled = isIdle && !selectionNeedsBuild && !string.IsNullOrEmpty(editor.Text);
+        saveBundleButton.Enabled = isIdle && !selectionNeedsBuild && textPreparation.Result.Error is null
+            && !string.IsNullOrEmpty(editor.Text);
         buildBundleButton.Enabled = isIdle && fileSelection.Files.Count > 0;
         removeBundleFileButton.Enabled = isIdle && fileSelection.Files.Count > 0;
         clearBundleFilesButton.Enabled = isIdle && fileSelection.Files.Count > 0;
         bundleFilesSpinner.Enabled = isIdle;
         compressBundle.Enabled = isIdle;
+        compressText.Enabled = isIdle;
         clipboardButton.Enabled = isIdle;
         editor.Enabled = isIdle;
         replaceUnsupported.Enabled = isIdle;
@@ -762,6 +771,15 @@ public sealed partial class MainActivity : Activity
         saveBundleButton = Button("Als .copycop speichern …", Primary);
         saveBundleButton.Click += async (_, _) => await SaveBundleAsync();
         editorCard.AddView(saveBundleButton, WithTopMargin(MatchWrap(), 8));
+
+        compressText = new CheckBox(this) { Text = "Text komprimieren – Empfang über HTML" };
+        compressText.SetTextColor(TextPrimary);
+        compressText.ButtonTintList = ColorStateList.ValueOf(Primary);
+        compressText.CheckedChange += (_, _) => Reassess(clearParts: true);
+        editorCard.AddView(compressText, WithTopMargin(MatchWrap(), 8));
+        textCompressionHint = Label(string.Empty, 13, Muted);
+        textCompressionHint.Visibility = ViewStates.Gone;
+        editorCard.AddView(textCompressionHint, WithTopMargin(MatchWrap(), 4));
 
         editor = new EditText(this)
         {

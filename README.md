@@ -73,6 +73,14 @@ Anleitung, Grenzen und Formatspezifikation: [.copycop-Dateiformat](docs/copycop-
 
 ### Grafische Oberfläche
 
+Der neue Haken **Text komprimieren – Empfang über HTML** verpackt eingefügten
+oder eingelesenen Text automatisch für den Transfer. Er ist standardmäßig aus.
+Der Originaltext bleibt im Editor; Größe, Tippdauer und Aufteilung beziehen
+sich auf den Übertragungstext. Am Ziel in `copycop.html` empfangen, entpacken
+und den Originaltext als `text.txt` speichern. Bei kurzen Texten kann das Paket
+größer sein; die Anzeige zeigt den tatsächlichen Unterschied. Diese Option
+gibt es auch in Android. Für direktes Tippen in andere Anwendungen bleibt sie aus.
+
 Die GUI läuft ohne Konsolenfenster und verbindet sich automatisch mit CopyCop
 im blauen LOAD-Modus. Man kann Text direkt einfügen, aus der
 System-Zwischenablage holen, über „Datei öffnen …“ aus einer Text- oder

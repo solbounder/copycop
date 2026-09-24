@@ -47,3 +47,8 @@ Die verteilte `web/copycop.html` ist eine komprimierte, selbstentpackende HTML-D
 Inhalt mit der Quelldatei und prüfen die tatsächlich verteilte HTML mit CopyCops
 Zeichenprüfung, Normalisierung und Gerätegrenze. So bleibt auch die Empfangsseite
 selbst ohne Zeichenersetzung in einem Geräteteil übertragbar.
+
+Textkompression wird mit unverändertem Editorinhalt, Unicode und CRLF,
+Ein-/Ausschalten, Clipboard-Wechsel, kurzen und mehrteiligen Texten,
+Vorbereitungsschäden, Größenlimits, Speicherung und doppelten Paket-Hüllen
+geprüft. Desktop und Android verwenden dieselbe Vorbereitung des Transfertexts.

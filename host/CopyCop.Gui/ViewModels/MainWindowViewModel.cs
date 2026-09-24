@@ -24,6 +24,8 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     private bool selectionNeedsBuild;
     private readonly Func<string, CancellationToken, Task<string?>>? saveBundle;
     private bool compressBundle = true;
+    private bool compressText;
+    private readonly TextTransferPreparation textPreparation = new();
     private bool isReadingInput;
     private readonly CancellationTokenSource lifetime = new();
     private CancellationTokenSource? transferCancellation;
@@ -75,7 +77,8 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
             RefreshFileSelection(changed: true);
         }, () => IsIdle && HasBundleFiles);
         SaveBundleCommand = new AsyncRelayCommand(SaveBundleAsync,
-            () => IsIdle && !selectionNeedsBuild && Text.Length > 0 && this.saveBundle is not null);
+            () => IsIdle && !selectionNeedsBuild && textPreparation.Result.Error is null
+                && Text.Length > 0 && this.saveBundle is not null);
         SplitCommand = new RelayCommand(SplitText, () => IsIdle && NeedsSplit && !HasBlockingUnsupported);
         SendCommand = new AsyncRelayCommand(SendSelectedAsync, () => CanSend);
         CancelCommand = new RelayCommand(CancelTransfer, () => IsBusy);
@@ -121,6 +124,21 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
             Reassess(clearParts: true);
         }
     }
+
+    public bool CompressText
+    {
+        get => compressText;
+        set
+        {
+            if (!SetProperty(ref compressText, value)) return;
+            Reassess(clearParts: true);
+        }
+    }
+
+    public string TextCompressionHint => textPreparation.Result.Hint;
+    public string TransferModeText => CompressText
+        ? "HTML-Empfang · Originaltext bleibt erhalten"
+        : "Deutsches QWERTZ · CRLF wird normalisiert";
 
     public bool ReplaceUnsupported
     {
@@ -202,13 +220,13 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         private set => SetProperty(ref transferProgress, value);
     }
 
-    public string CapacityHeadline => !assessment.HasText
+    public string CapacityHeadline => textPreparation.Result.Error is not null ? "Kompression fehlgeschlagen" : !assessment.HasText
         ? "Noch kein Text"
         : HasBlockingUnsupported
             ? "Nicht unterstützte Zeichen"
             : assessment.FitsCapacity ? "Passt vollständig" : "Text ist zu groß";
 
-    public IBrush CapacityBrush => !assessment.HasText ? Muted
+    public IBrush CapacityBrush => textPreparation.Result.Error is not null ? Red : !assessment.HasText ? Muted
         : HasBlockingUnsupported ? Red
         : assessment.FitsCapacity ? Green : Amber;
 
@@ -295,7 +313,8 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
 
     private void Reassess(bool clearParts)
     {
-        assessment = TextCapacity.Assess(Text, ReplaceUnsupported);
+        var prepared = textPreparation.Prepare(Text, CompressText);
+        assessment = TextCapacity.Assess(prepared.Text, ReplaceUnsupported);
         UpdateTypingEstimate();
         if (clearParts)
         {
@@ -309,6 +328,8 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
 
     private void RaiseAssessmentProperties()
     {
+        OnPropertyChanged(nameof(TextCompressionHint));
+        OnPropertyChanged(nameof(TransferModeText));
         OnPropertyChanged(nameof(CapacityHeadline));
         OnPropertyChanged(nameof(CapacityBrush));
         OnPropertyChanged(nameof(CharacterText));
@@ -486,7 +507,7 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         NotifyCommands();
         try
         {
-            var source = Text;
+            var source = CompressText ? textPreparation.Result.Text : Text;
             var compress = CompressBundle;
             var contents = await Task.Run(() => CopyCopBundle.PrepareForSave(source, compress), lifetime.Token);
             lifetime.Token.ThrowIfCancellationRequested();

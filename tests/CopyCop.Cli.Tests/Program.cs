@@ -125,6 +125,7 @@ foreach (var fixture in fixtures)
 
 await FileImportTests.RunAsync(Check);
 await BundleTests.RunAsync(Check);
+await TextCompressionTests.RunAsync(Check);
 
 if (failures.Count > 0)
 {

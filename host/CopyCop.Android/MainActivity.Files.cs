@@ -19,6 +19,7 @@ public sealed partial class MainActivity
     private const int BundleFolderRequest = 1004;
     private const string PendingRequestState = "copycop.pendingFileRequest";
     private const string CompressionState = "copycop.compressBundle";
+    private const string TextCompressionState = "copycop.compressText";
     private const string PendingExportState = "copycop.pendingExportPath";
     private int pendingFileRequest;
     private bool pendingCompression = true;
@@ -35,6 +36,7 @@ public sealed partial class MainActivity
         pendingCompression = state?.GetBoolean(CompressionState, true) ?? true;
         pendingExportPath = state?.GetString(PendingExportState);
         compressBundle.Checked = pendingCompression;
+        compressText.Checked = state?.GetBoolean(TextCompressionState, false) ?? false;
         draftPath = state?.GetString(DraftPathState);
         if (draftPath is not null && File.Exists(draftPath))
         {
@@ -60,6 +62,7 @@ public sealed partial class MainActivity
         outState.PutBoolean(FilePickerPendingState, filePickerPending);
         outState.PutInt(PendingRequestState, pendingFileRequest);
         outState.PutBoolean(CompressionState, filePickerPending ? pendingCompression : compressBundle.Checked);
+        outState.PutBoolean(TextCompressionState, compressText.Checked);
         // Store only a private cache path, never a multi-megabyte payload in Android's state Bundle.
         outState.PutString(PendingExportState, pendingExportPath);
         try
@@ -103,10 +106,10 @@ public sealed partial class MainActivity
 
     private async Task SaveBundleAsync()
     {
-        if (isBusy || isImporting || string.IsNullOrEmpty(editor.Text)) return;
+        if (isBusy || isImporting || textPreparation.Result.Error is not null || string.IsNullOrEmpty(editor.Text)) return;
         isImporting = true;
         UpdateActionState();
-        var source = editor.Text!;
+        var source = compressText.Checked ? textPreparation.Result.Text : editor.Text!;
         pendingCompression = compressBundle.Checked;
         try
         {

@@ -1,5 +1,11 @@
 # CopyCop Hostprogramme
 
+**Text komprimieren – Empfang über HTML** ist in Desktop und Android optional
+für eingefügten Text verfügbar. Der Originaltext bleibt im Editor; Paketgröße,
+Ersparnis, Tippdauer und Aufteilung beziehen sich auf die übertragene Fassung.
+Am Ziel in `copycop.html` entpacken und `text.txt` speichern. Für direktes Tippen
+und zum Übertragen der selbstentpackenden Empfangs-HTML den Haken ausschalten.
+
 - `CopyCop` / `CopyCop.exe`: grafische Oberfläche ohne Konsolenfenster
 - `copycop-cli` / `copycop-cli.exe`: optionale Kommandozeile
 

@@ -9,6 +9,18 @@ Dateisystem-Metadaten werden nicht übernommen.
 
 ## Benutzung
 
+Für eingefügten oder über **Datei öffnen …** eingelesenen Text gibt es in
+Desktop und Android **Text komprimieren – Empfang über HTML**. Standardmäßig
+ist dieser Haken aus: Text wird direkt getippt. Eingeschaltet verpackt die App
+den Originaltext automatisch und verlustfrei als `text.txt` in einem Paket,
+bevor er auf das Gerät geladen wird. Auch die physische C-Taste nutzt diese
+Einstellung. Der Editor bleibt unverändert; die Anzeige zeigt die tatsächliche
+Paketgröße und Ersparnis, bei kurzen Texten auch einen möglichen Mehrbedarf.
+Aufteilung und Tippdauer gelten für das vorbereitete Paket. Am Ziel mit der
+HTML empfangen und `text.txt` speichern. Ausschalten stellt die direkte
+Textausgabe wieder her. Bereits vorbereitete `.copycop`-Pakete werden nicht
+noch einmal verpackt.
+
 1. In der Desktop- oder Android-App **Dateien hinzufügen …** oder **Ordner
    hinzufügen …** wählen. Jede weitere Auswahl ergänzt die bestehende Liste,
    auch wenn der Dateidialog nur eine Datei auf einmal anbietet. Einzelne
@@ -35,6 +47,8 @@ Die HTML-Datei muss vor der Übertragung auf dem Zielrechner verfügbar sein.
 Sie ist eine komprimierte, selbstentpackende HTML-Datei: In der App über
 **Datei öffnen …** als normalen Text laden, mit CopyCop in einen einfachen
 Texteditor auf dem Zielrechner tippen und dort als `copycop.html` speichern.
+Dabei **Text komprimieren – Empfang über HTML** ausgeschaltet lassen, da die
+Empfangsseite bereits selbstentpackend ist und zuerst auf dem Ziel benötigt wird.
 Automatisches Einrücken und automatische Zeichenersetzung im Editor abschalten.
 Der übertragene Quelltext enthält ausschließlich von CopyCop unterstützte
 ASCII-Zeichen und passt in einen Geräteteil. Beim Öffnen im Browser entpackt
