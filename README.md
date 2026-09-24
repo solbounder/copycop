@@ -52,9 +52,19 @@ Beim Einstecken wählt eine gehaltene Gerätetaste den Modus:
 
 Die GUI läuft ohne Konsolenfenster und verbindet sich automatisch mit CopyCop
 im blauen LOAD-Modus. Man kann Text direkt einfügen, aus der
-System-Zwischenablage holen, prüfen, aufteilen und den gewünschten Teil
+System-Zwischenablage holen, über „Datei öffnen …“ aus einer Text- oder
+Quellcodedatei einlesen, prüfen, aufteilen und den gewünschten Teil
 speichern. Ein Druck auf die physische C-Taste liest ebenfalls die aktuelle
 Zwischenablage; passt sie vollständig, wird sie direkt übertragen.
+
+Der Dateiimport lädt jeweils eine Datei in den Editor; „Text auf CopyCop
+speichern“ überträgt den geprüften Inhalt. Unterstützt werden UTF-8 (mit oder
+ohne BOM) und UTF-16/UTF-32 mit BOM, bis zu 4 MiB pro Datei. Größere Texte
+als der Gerätespeicher werden wie eingefügter Text aufgeteilt. Lesefehler,
+ungültige Kodierungen und binäre Steuerzeichen werden gemeldet; der bisherige
+Editorinhalt bleibt bei einem Fehler oder Abbruch erhalten. Es wird der
+Textinhalt ausgegeben, keine Datei mit Dateinamen auf dem Ziel-PC angelegt.
+PDF-, Office- und Bilddateien werden nicht in Text umgewandelt.
 
 Die GUI kann für diese Zielsysteme veröffentlicht werden:
 
@@ -66,7 +76,10 @@ Die GUI kann für diese Zielsysteme veröffentlicht werden:
 ### Android-App
 
 Die Android-App übernimmt dieselbe Textprüfung, Aufteilung und Tippdauer-
-Berechnung wie die Desktop-GUI. Sie verbindet CopyCop im blauen LOAD-Modus
+Berechnung wie die Desktop-GUI. Über „Datei öffnen …“ liest sie Text- und
+Quellcodedateien aus Androids Dateiauswahl ein (UTF-8 oder UTF-16/32 mit BOM,
+maximal 4 MiB). Anschließend kann der geprüfte Text oder ein ausgewählter Teil
+gespeichert werden. Sie verbindet CopyCop im blauen LOAD-Modus
 direkt per USB-Host/OTG, fragt Androids USB-Berechtigung ab und speichert den
 ausgewählten Text oder Teil auf dem Gerät. Erforderlich sind Android 8.0 oder
 neuer, USB-Host-Unterstützung und ein passendes OTG-Kabel beziehungsweise ein
@@ -86,7 +99,7 @@ Die bisherige CLI bleibt erhalten und verwendet denselben plattformübergreifend
 Core:
 
 ```text
-copycop-cli [--replace-unsupported] [--part N] [--once]
+copycop-cli [--file PATH] [--replace-unsupported] [--part N] [--once]
 ```
 
 Sie wartet auf C, bewertet Zeichen und Bytebelegung und fragt bei einem zu

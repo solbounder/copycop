@@ -4,12 +4,20 @@ Die CLI läuft unter Windows, macOS und Linux und besitzt dieselbe
 Kapazitäts-, Unicode-, Split- und HID-Logik wie die grafische CopyCop-App.
 
 ```text
-copycop-cli [--replace-unsupported] [--part N] [--once]
+copycop-cli [--file PATH] [--replace-unsupported] [--part N] [--once]
 ```
 
 - `--replace-unsupported`: unbekannte Unicode-Zeichen als `?` speichern
 - `--part N`: bei übergroßem Text automatisch erzeugten Teil N speichern
 - `--once`: nach einem Ladeversuch beenden
+- `--file PATH`: eine Textdatei statt der Zwischenablage verwenden
+
+Beispiel: `copycop-cli --file "C:\Texte\beispiel.txt" --once` liest die Datei
+beim Start ein. Nach Verbindung im LOAD-Modus startet die physische C-Taste
+die Übertragung dieses Inhalts. Änderungen an der Datei erfordern einen
+Neustart der CLI. Unterstützt werden UTF-8 sowie UTF-16/UTF-32 mit BOM, bis
+zu 4 MiB. Leere, unlesbare oder ungültig kodierte Dateien werden vor der
+Gerätesuche gemeldet. Der Ziel-PC erhält den Text als Tastatureingabe.
 
 Ohne `--part` zeigt die CLI alle Teilgrößen und fragt interaktiv nach der
 gewünschten Teilnummer. Jeder Teil ist höchstens 126.464 UTF-8-Bytes groß.

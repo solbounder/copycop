@@ -18,7 +18,8 @@ demselben `CopyCop.Core`, den auch Desktop-GUI und CLI verwenden.
 3. Die mittlere C-Taste am Gerät halten und CopyCop mit dem Android-Gerät
    verbinden.
 4. Den Android-Dialog für den USB-Zugriff bestätigen.
-5. Text einfügen oder aus der Zwischenablage übernehmen und auf
+5. Über **Datei öffnen …** eine Textdatei auswählen, Text einfügen oder aus der
+   Zwischenablage übernehmen und auf
    **Text auf CopyCop speichern** tippen.
 6. CopyCop nach der grünen Bestätigung abziehen und im normalen Modus mit dem
    Ziel-PC verbinden.
@@ -28,6 +29,24 @@ LOAD-Modus die Android-Zwischenablage und startet den Transfer automatisch,
 wenn der Text vollständig übertragbar ist. Android erlaubt Apps im Hintergrund
 keinen allgemeinen Zwischenablagezugriff; in diesem Fall fordert die App zum
 manuellen Öffnen auf.
+
+## Textdateien einlesen
+
+**Datei öffnen …** öffnet Androids Dateiauswahl, etwa für Dateien aus Downloads
+oder einem installierten Dokumentanbieter. Es ist keine allgemeine
+Speicherberechtigung erforderlich. Die App liest jeweils eine Datei in den
+Editor; erst **Text auf CopyCop speichern** überträgt ihren geprüften Inhalt.
+Die physische C-Taste bleibt für die Zwischenablage zuständig.
+
+Unterstützt werden UTF-8 (mit oder ohne BOM) sowie UTF-16/UTF-32 mit BOM, bis
+zu 4 MiB pro Datei. Auch Quellcodedateien können ausgewählt werden. Die
+vorhandene Zeichenprüfung, Tippdauer und Aufteilung in gerätegerechte Teile
+gelten ebenso für importierten Text. Bei Abbruch oder Lesefehlern bleibt der
+bisherige Editorinhalt erhalten. Während Auswahl, Einlesen und Übertragung
+sind konkurrierende Bearbeitungsaktionen gesperrt.
+
+CopyCop gibt den Textinhalt als Tastatureingabe aus; es legt keine Datei auf
+dem Ziel-PC an. PDF-, Office- und Bilddateien werden nicht in Text umgewandelt.
 
 ## Bauen
 

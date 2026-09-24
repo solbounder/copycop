@@ -111,6 +111,8 @@ var fixtures = new[]
 foreach (var fixture in fixtures)
     Check(UnicodeAnalyzer.Analyze(fixture, false).Unsupported.Count == 0, $"fixture: {fixture[..Math.Min(12, fixture.Length)]}");
 
+await FileImportTests.RunAsync(Check);
+
 if (failures.Count > 0)
 {
     Console.Error.WriteLine("Fehlgeschlagen: " + string.Join(", ", failures));

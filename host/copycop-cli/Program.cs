@@ -8,7 +8,7 @@ namespace CopyCop.Cli;
 
 internal static class Program
 {
-    private sealed record Options(bool ReplaceUnsupported, bool Once, int? Part);
+    private sealed record Options(bool ReplaceUnsupported, bool Once, int? Part, string? FilePath);
 
     private static async Task<int> Main(string[] args)
     {
@@ -24,6 +24,19 @@ internal static class Program
 
         try
         {
+            string? fileText = null;
+            if (options.FilePath is not null)
+            {
+                await using var stream = File.OpenRead(options.FilePath);
+                fileText = await TextFileReader.ReadAsync(stream, cancellation.Token);
+                if (fileText.Length == 0)
+                {
+                    Console.Error.WriteLine("Die Datei ist leer.");
+                    return 2;
+                }
+                Console.WriteLine($"Datei eingelesen: {Path.GetFileName(options.FilePath)}");
+            }
+
             Console.WriteLine("Suche CopyCop im blauen LOAD-Modus …");
             string? lastWaitStatus = null;
             var device = await CopyCopDevice.WaitForLoadDeviceAsync(
@@ -48,9 +61,11 @@ internal static class Program
             {
                 Console.WriteLine("Warte auf C …");
                 await client.WaitForCopyAsync(cancellation.Token);
-                Console.WriteLine("C gedrückt – lese Zwischenablage.");
+                Console.WriteLine(fileText is null
+                    ? "C gedrückt – lese Zwischenablage."
+                    : "C gedrückt – übernehme eingelesene Datei.");
 
-                var clipboard = await ClipboardService.GetTextAsync();
+                var clipboard = fileText ?? await ClipboardService.GetTextAsync();
                 if (string.IsNullOrEmpty(clipboard))
                 {
                     Console.WriteLine("Die Zwischenablage enthält keinen Text.");
@@ -175,6 +190,7 @@ internal static class Program
         var replace = false;
         var once = false;
         int? part = null;
+        string? filePath = null;
 
         for (var index = 0; index < args.Length; index++)
         {
@@ -182,6 +198,17 @@ internal static class Program
             {
                 case "--replace-unsupported": replace = true; break;
                 case "--once": once = true; break;
+                case "--file":
+                    if (filePath is not null || index + 1 >= args.Length
+                        || string.IsNullOrWhiteSpace(args[index + 1])
+                        || args[index + 1].StartsWith("--", StringComparison.Ordinal))
+                    {
+                        Console.Error.WriteLine("--file benötigt genau einen Dateipfad und darf nur einmal angegeben werden.");
+                        options = null;
+                        return false;
+                    }
+                    filePath = args[++index];
+                    break;
                 case "--part" when index + 1 < args.Length
                                    && int.TryParse(args[++index], out var parsed):
                     part = parsed;
@@ -199,13 +226,14 @@ internal static class Program
             }
         }
 
-        options = new Options(replace, once, part);
+        options = new Options(replace, once, part, filePath);
         return true;
     }
 
     private static void PrintHelp()
     {
-        Console.WriteLine("copycop-cli [--replace-unsupported] [--part N] [--once]");
+        Console.WriteLine("copycop-cli [--file PATH] [--replace-unsupported] [--part N] [--once]");
+        Console.WriteLine("  --file PATH           Textdatei statt Zwischenablage verwenden; C startet das Speichern");
         Console.WriteLine("  --replace-unsupported  unbekannte Zeichen durch ? ersetzen");
         Console.WriteLine("  --part N              bei zu großem Text genau Teil N speichern");
         Console.WriteLine("  --once                nach einem Ladeversuch beenden");

@@ -16,6 +16,8 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     private static readonly IBrush Muted = new SolidColorBrush(Color.Parse("#8D9AB5"));
 
     private readonly Func<Task<string?>> readClipboard;
+    private readonly Func<CancellationToken, Task<(string Name, string Text)?>> readTextFile;
+    private bool isReadingInput;
     private readonly CancellationTokenSource lifetime = new();
     private CancellationTokenSource? transferCancellation;
     private Task? connectionTask;
@@ -36,19 +38,23 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     private TypingWorkload typingWorkload;
     private bool hasTypingEstimate;
 
-    public MainWindowViewModel(Func<Task<string?>> readClipboard)
+    public MainWindowViewModel(Func<Task<string?>> readClipboard,
+        Func<CancellationToken, Task<(string Name, string Text)?>> readTextFile)
     {
         this.readClipboard = readClipboard;
+        this.readTextFile = readTextFile;
         assessment = TextCapacity.Assess(string.Empty, false);
         UpdateTypingEstimate();
-        PasteClipboardCommand = new AsyncRelayCommand(PasteClipboardAsync, () => !IsBusy);
-        SplitCommand = new RelayCommand(SplitText, () => NeedsSplit && !HasBlockingUnsupported);
+        PasteClipboardCommand = new AsyncRelayCommand(PasteClipboardAsync, () => IsIdle);
+        OpenFileCommand = new AsyncRelayCommand(OpenFileAsync, () => IsIdle);
+        SplitCommand = new RelayCommand(SplitText, () => IsIdle && NeedsSplit && !HasBlockingUnsupported);
         SendCommand = new AsyncRelayCommand(SendSelectedAsync, () => CanSend);
         CancelCommand = new RelayCommand(CancelTransfer, () => IsBusy);
     }
 
     public ObservableCollection<TextPart> Parts { get; } = [];
     public AsyncRelayCommand PasteClipboardCommand { get; }
+    public AsyncRelayCommand OpenFileCommand { get; }
     public RelayCommand SplitCommand { get; }
     public AsyncRelayCommand SendCommand { get; }
     public RelayCommand CancelCommand { get; }
@@ -135,7 +141,7 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         }
     }
 
-    public bool IsIdle => !IsBusy;
+    public bool IsIdle => !IsBusy && !isReadingInput;
 
     public double TransferProgress
     {
@@ -225,7 +231,7 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         ? "Text auf CopyCop speichern"
         : $"Teil {SelectedPart.Number} auf CopyCop speichern";
 
-    public bool CanSend => IsConnected && !IsBusy && assessment.HasText
+    public bool CanSend => IsConnected && IsIdle && assessment.HasText
         && !HasBlockingUnsupported
         && (assessment.FitsCapacity || SelectedPart is not null);
 
@@ -298,8 +304,46 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
         ActivityBrush = Blue;
     }
 
-    private async Task PasteClipboardAsync()
+    private async Task OpenFileAsync()
     {
+        isReadingInput = true;
+        OnPropertyChanged(nameof(IsIdle));
+        NotifyCommands();
+        try
+        {
+            var file = await readTextFile(lifetime.Token);
+            if (file is null || lifetime.IsCancellationRequested) return;
+            // Invalidate an old part selection even when the new file has identical content.
+            if (Text == file.Value.Text) Reassess(clearParts: true);
+            else Text = file.Value.Text;
+            ActivityText = !assessment.HasText
+                ? $"„{file.Value.Name}“ ist leer."
+                : HasBlockingUnsupported
+                    ? $"„{file.Value.Name}“ eingelesen. Bitte nicht unterstützte Zeichen prüfen."
+                    : assessment.FitsCapacity
+                        ? $"„{file.Value.Name}“ eingelesen und geprüft. Bereit zum Speichern."
+                        : $"„{file.Value.Name}“ eingelesen. Bitte in {assessment.RequiredParts:N0} Teile aufteilen.";
+            ActivityBrush = assessment.CanTransfer ? Green : Amber;
+        }
+        catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+        catch (Exception exception)
+        {
+            ActivityText = $"Datei konnte nicht eingelesen werden: {exception.Message}";
+            ActivityBrush = Red;
+        }
+        finally
+        {
+            isReadingInput = false;
+            OnPropertyChanged(nameof(IsIdle));
+            NotifyCommands();
+        }
+    }
+
+    private async Task<bool> PasteClipboardAsync()
+    {
+        isReadingInput = true;
+        OnPropertyChanged(nameof(IsIdle));
+        NotifyCommands();
         try
         {
             var clipboard = await readClipboard();
@@ -307,24 +351,32 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
             {
                 ActivityText = "Die Zwischenablage enthält keinen Text.";
                 ActivityBrush = Amber;
-                return;
+                return false;
             }
             Text = clipboard;
             ActivityText = assessment.FitsCapacity
                 ? "Zwischenablage eingefügt und geprüft."
                 : $"Zwischenablage benötigt {assessment.RequiredParts:N0} Teile.";
             ActivityBrush = assessment.FitsCapacity ? Green : Amber;
+            return true;
         }
         catch (Exception exception)
         {
             ActivityText = $"Zwischenablage konnte nicht gelesen werden: {exception.Message}";
             ActivityBrush = Red;
+            return false;
+        }
+        finally
+        {
+            isReadingInput = false;
+            OnPropertyChanged(nameof(IsIdle));
+            NotifyCommands();
         }
     }
 
     private async Task HandleHardwareCopyAsync()
     {
-        await PasteClipboardAsync();
+        if (!IsIdle || !await PasteClipboardAsync()) return;
         if (assessment.CanTransfer) await SendTextAsync(assessment.Analysis.Text);
         else if (NeedsSplit)
         {
@@ -449,6 +501,7 @@ public sealed class MainWindowViewModel : ObservableObject, IAsyncDisposable
     private void NotifyCommands()
     {
         PasteClipboardCommand.RaiseCanExecuteChanged();
+        OpenFileCommand.RaiseCanExecuteChanged();
         SplitCommand.RaiseCanExecuteChanged();
         SendCommand.RaiseCanExecuteChanged();
         CancelCommand.RaiseCanExecuteChanged();

@@ -9,5 +9,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\host\CopyCop.Core\CopyCop.Core.csproj" />
+    <ProjectReference Include="..\..\host\CopyCop.Gui\CopyCop.Gui.csproj" />
   </ItemGroup>
 </Project>
