@@ -32,8 +32,16 @@ Dateisystem-Metadaten werden nicht übernommen.
    erhält Unterordner; ein einzelner Browserdownload verwendet den Basisnamen.
 
 Die HTML-Datei muss vor der Übertragung auf dem Zielrechner verfügbar sein.
+Sie ist eine komprimierte, selbstentpackende HTML-Datei: In der App über
+**Datei öffnen …** als normalen Text laden, mit CopyCop in einen einfachen
+Texteditor auf dem Zielrechner tippen und dort als `copycop.html` speichern.
+Automatisches Einrücken und automatische Zeichenersetzung im Editor abschalten.
+Der übertragene Quelltext enthält ausschließlich von CopyCop unterstützte
+ASCII-Zeichen und passt in einen Geräteteil. Beim Öffnen im Browser entpackt
+die Datei sich selbst; dafür ist kein `.copycop`-Paket erforderlich.
 Sie lädt keine Skripte, Schriftarten oder Dienste aus dem Internet. Zum lokalen
-Entpacken komprimierter Dateien benötigt sie die Browser-Unterstützung für
+Öffnen benötigt sie `DecompressionStream("gzip")`, zum Entpacken empfangener Dateien
+zusätzlich die Browser-Unterstützung für
 [`DecompressionStream("deflate-raw")`](https://developer.mozilla.org/en-US/docs/Web/API/DecompressionStream/DecompressionStream).
 
 Die HTML-Seite dient ausschließlich dem Empfang, Prüfen und Entpacken. Das

@@ -85,6 +85,18 @@ Check(eurosAtLimit.FitsCapacity && !eurosOverLimit.FitsCapacity, "three-byte cap
 Check(!TextCapacity.Assess("A😀B", false).CanTransfer, "unsupported blocks transfer");
 Check(TextCapacity.Assess("A😀B", true).CanTransfer, "replacement enables transfer");
 
+// The receiver itself must be transferable before it can unpack any packages.
+var receiverHtml = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "copycop.html"));
+var receiverAnalysis = UnicodeAnalyzer.Analyze(receiverHtml, false);
+Check(receiverAnalysis.Unsupported.Count == 0,
+    "receiver HTML contains no unsupported keyboard characters: "
+    + string.Join(", ", receiverAnalysis.Unsupported.Select(item => $"U+{item.CodePoint:X4}").Distinct()));
+Check(receiverAnalysis.Text == receiverHtml.ReplaceLineEndings("\n"),
+    "keyboard normalization preserves receiver HTML source apart from line endings");
+var receiverCapacity = TextCapacity.Assess(receiverHtml, false);
+Check(receiverCapacity.CanTransfer && receiverCapacity.RequiredParts == 1,
+    "complete receiver HTML transfers in one device part without character replacement");
+
 var longText = new string('a', TextCapacity.FirmwareMaximumBytes - 20)
                + "\n" + new string('b', 200);
 var split = TextSplitter.Split(longText, TextCapacity.FirmwareMaximumBytes);

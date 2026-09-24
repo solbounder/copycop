@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { gunzipSync } from 'node:zlib';
 import { zipFixture, envelopeFixture } from './zip-fixture.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -13,7 +14,14 @@ const scratch = resolve(process.argv[2] || join(root, 'build', 'bundle-tests'));
 await mkdir(scratch, { recursive: true });
 const work = await mkdtemp(join(scratch, 'run-'));
 const html = await readFile(join(root, 'web', 'copycop.html'), 'utf8');
-vm.runInThisContext(html.match(/<script id="copycop-codec">([\s\S]*?)<\/script>/)[1]);
+assert.ok(!/[^\x09\x0a\x0d\x20-\x7e]/.test(html), 'receiver source uses only keyboard-safe ASCII');
+const payload = html.match(/<script id="copycop-payload" type="application\/octet-stream">([A-Za-z0-9+/=]+)<\/script>/)?.[1];
+assert.ok(payload, 'standalone receiver contains its compressed payload');
+const source = (await readFile(join(root, 'web', 'copycop.source.html'), 'utf8')).replace(/\r\n?/g, '\n');
+const restoredHtml = gunzipSync(Buffer.from(payload, 'base64')).toString('utf8');
+assert.equal(restoredHtml, source, 'published HTML contains the complete current receiver source');
+assert.ok(html.length < source.length * 0.7, 'compressed receiver saves at least 30% typing');
+vm.runInThisContext(restoredHtml.match(/<script id="copycop-codec">([\s\S]*?)<\/script>/)[1]);
 const codec = globalThis.CopyCopCodec;
 const cli = join(root, 'host', 'copycop-cli', 'bin', 'Release', 'net8.0', 'copycop-cli.dll');
 function command(args, success = true) {
@@ -29,7 +37,7 @@ const samples = [
 for (const sample of samples) await writeFile(join(work, sample.name), sample.data);
 assert.equal(codec.pack, undefined, 'receiver has no bundle creation API');
 assert.equal(codec.frame, undefined, 'receiver has no sending API');
-assert.ok(!html.includes('id="source-files"') && !html.includes('id="pack"'), 'HTML contains only receiving controls');
+assert.ok(!restoredHtml.includes('id="source-files"') && !restoredHtml.includes('id="pack"'), 'HTML contains only receiving controls');
 for (const compress of [true, false]) {
   const name = compress ? 'compressed' : 'stored';
   const file = join(work, `${name}-cli.copycop`);
@@ -61,7 +69,7 @@ await assert.rejects(() => codec.decode(big.text + nested.text), /unterschiedlic
 await assert.rejects(() => codec.decode(big.text + 'garbage'), /ungültiger Teil/);
 await assert.rejects(() => codec.decode(big.text.replaceAll('COPYCOP/1', 'COPYCOP/2')), /Version 1/);
 await assert.rejects(() => codec.decode('x'.repeat(codec.MAX_TEXT + 1)), /größer/);
-for (const name of ['../escape', '/root', 'a\\b', 'C:/drive', 'CON.txt', 'a/../b', 'dir/', 'nul']) {
+for (const name of ['../escape', '/root', 'a\\b', 'C:/drive', 'CON.txt', 'COM\u00b9.txt', 'LPT\u00b2.log', 'COM\u00b3', 'a/../b', 'dir/', 'nul']) {
   const archive = zipFixture(name, samples[0].data);
   await assert.rejects(() => codec.unzip(archive), /Datei/);
 }

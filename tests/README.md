@@ -40,3 +40,10 @@ nacheinander ausgewählte Einzeldateien, ergänzte Ordner, identische Duplikate,
 Namenskonflikte, Abbruch, Entfernen, Leeren und das Ergänzen wieder geöffneter
 Pakete. Veraltete Pakete sind nach Änderungen der Dateiliste nicht mehr sendbar.
 Die Browserprüfung stellt sicher, dass keine Paket-Erstellung im HTML enthalten ist.
+
+Die verteilte `web/copycop.html` ist eine komprimierte, selbstentpackende HTML-Datei.
+Änderungen erfolgen in `web/copycop.source.html`; anschließend mit
+`node web/build-receiver.mjs` neu erzeugen. Die Tests vergleichen den entpackten
+Inhalt mit der Quelldatei und prüfen die tatsächlich verteilte HTML mit CopyCops
+Zeichenprüfung, Normalisierung und Gerätegrenze. So bleibt auch die Empfangsseite
+selbst ohne Zeichenersetzung in einem Geräteteil übertragbar.

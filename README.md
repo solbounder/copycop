@@ -62,7 +62,9 @@ Große Pakete werden in nummerierte, einzeln ladbare Geräteteile aufgeteilt.
 Auf dem Zielrechner nimmt die lokale [copycop.html](web/copycop.html) alle
 getippten Teile entgegen, prüft Vollständigkeit und Prüfsummen und bietet die
 wiederhergestellten Dateien einzeln oder als ZIP an. Die HTML-Seite dient nur
-zum Empfang und benötigt keinen Server oder Upload. Das Gerät hält
+zum Empfang und benötigt keinen Server oder Upload. Sie ist selbst komprimiert,
+entpackt sich beim Öffnen im Browser und lässt sich als normaler HTML-Quelltext
+mit CopyCop übertragen, ohne nicht unterstützte Zeichen zu ersetzen. Das Gerät hält
 weiterhin jeweils einen Teil; eine Firmwareänderung ist nicht erforderlich.
 
 CLI: `copycop-cli pack paket.copycop datei1.txt datei2.py` und

@@ -10,5 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\host\CopyCop.Core\CopyCop.Core.csproj" />
     <ProjectReference Include="..\..\host\CopyCop.Gui\CopyCop.Gui.csproj" />
+    <Content Include="..\..\web\copycop.html" Link="Fixtures\copycop.html" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
