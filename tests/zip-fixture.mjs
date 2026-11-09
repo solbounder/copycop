@@ -24,5 +24,6 @@ export function zipFixture(name, data) {
 
 export function envelopeFixture(archive) {
   const hash = createHash('sha256').update(archive).digest('hex');
-  return `COPYCOP/1 ${hash} 1/1\n${Buffer.from(archive).toString('base64')}\nENDCOPYCOP\n`;
+  const data = Buffer.from(archive).toString('base64');
+  return `COPYCOP/1 ${hash} 1/1 ${data.length}\n${data}\nENDCOPYCOP\n`;
 }

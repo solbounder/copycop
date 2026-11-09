@@ -48,6 +48,18 @@ internal static class BundleTests
         check(smaller.All(part => part.Utf8Bytes <= 4096)
             && CopyCopBundle.Read(string.Concat(smaller.Select(part => part.Text)))[0].Data.SequenceEqual(random),
             "reframing for a smaller device retains content");
+        check(parts.All(part =>
+            {
+                var header = part.Text[..part.Text.IndexOf('\n')].Split(' ');
+                var body = part.Text[(part.Text.IndexOf('\n') + 1)..^"ENDCOPYCOP\n".Length].Replace("\n", "");
+                return header.Length == 4 && int.Parse(header[3]) == body.Length;
+            }), "every frame announces its Base64 length for receiver progress");
+        var legacy = string.Concat(parts.Select(part =>
+            System.Text.RegularExpressions.Regex.Replace(part.Text, @"^(COPYCOP/1 \S+ \d+/\d+) \d+\n", "$1\n")));
+        check(CopyCopBundle.Read(legacy)[0].Data.SequenceEqual(random), "frames without length remain readable");
+        var shortened = parts[0].Text.Replace("\nENDCOPYCOP\n", "ENDCOPYCOP\n")[..^("ENDCOPYCOP\n".Length + 4)] + "\nENDCOPYCOP\n";
+        Reject(() => CopyCopBundle.Read(shortened + string.Concat(parts.Skip(1).Select(part => part.Text))), check,
+            "frame shorter than its announced length rejected");
         Reject(() => CopyCopBundle.Read(parts[0].Text), check, "missing part rejected");
         Reject(() => CopyCopBundle.Read(reordered + "junk"), check, "trailing garbage rejected");
         Reject(() => CopyCopBundle.Read(reordered.Replace("COPYCOP/1", "COPYCOP/2")), check, "future version rejected");

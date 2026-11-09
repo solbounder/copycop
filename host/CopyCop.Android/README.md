@@ -34,7 +34,8 @@ manuellen Öffnen auf.
 
 Für eingefügten oder eingelesenen Text gibt es außerdem **Text komprimieren –
 Empfang über HTML**. Der Haken ist standardmäßig aus. Eingeschaltet wird der
-Originaltext als `text.txt` verpackt, während er im Editor erhalten bleibt.
+Originaltext als Textdatei verpackt, während er im Editor erhalten bleibt. Sie
+heißt nach den ersten Wörtern des Textes (ohne Wörter `text.txt`).
 Die Anzeige zeigt Paketgröße und Ersparnis oder Mehrbedarf. Speichern,
 Gerätetransfer, Aufteilung und Tippdauer verwenden die vorbereitete Fassung;
 auch die physische C-Taste beachtet den Haken. Am Ziel in `copycop.html`
@@ -53,7 +54,7 @@ Einzeldateien bleiben gemeinsam in der Liste. Mit der Dateiliste und
 nummerierte Geräteteile vor. **Als .copycop speichern …** öffnet den
 Android-Speicherdialog; **Datei öffnen …** lädt das Paket samt Dateiliste wieder,
 damit es ergänzt werden kann. Text im Editor lässt sich als enthaltene
-`text.txt` speichern. Änderungen an der Liste oder Kompression erfordern ein
+Textdatei speichern, benannt nach seinen ersten Wörtern. Änderungen an der Liste oder Kompression erfordern ein
 neues Paket; die vorherige Ausgabe wird dabei ungültig.
 
 Auswahl, Abbruch und Fehler erhalten die bisherigen Dateien. Bei einer vom

@@ -61,7 +61,11 @@ Zeilenenden bleiben beim Wiederherstellen erhalten.
 Große Pakete werden in nummerierte, einzeln ladbare Geräteteile aufgeteilt.
 Auf dem Zielrechner nimmt die lokale [copycop.html](web/copycop.html) alle
 getippten Teile entgegen, prüft Vollständigkeit und Prüfsummen und bietet die
-wiederhergestellten Dateien einzeln oder als ZIP an. Die HTML-Seite dient nur
+wiederhergestellten Dateien zum Anzeigen, Kopieren, Speichern oder als ZIP an.
+Normaler, nicht verpackter Text wird erkannt und kann direkt kopiert werden.
+Die schaltbare **Maske** verdeckt den getippten Text mit einem Ladebildschirm:
+Knopf drücken, V am CopyCop drücken, nur der Fortschrittsbalken ist sichtbar.
+Die HTML-Seite dient nur
 zum Empfang und benötigt keinen Server oder Upload. Sie ist selbst komprimiert,
 entpackt sich beim Öffnen im Browser und lässt sich als normaler HTML-Quelltext
 mit CopyCop übertragen, ohne nicht unterstützte Zeichen zu ersetzen. Das Gerät hält
@@ -77,7 +81,9 @@ Der neue Haken **Text komprimieren – Empfang über HTML** verpackt eingefügte
 oder eingelesenen Text automatisch für den Transfer. Er ist standardmäßig aus.
 Der Originaltext bleibt im Editor; Größe, Tippdauer und Aufteilung beziehen
 sich auf den Übertragungstext. Am Ziel in `copycop.html` empfangen, entpacken
-und den Originaltext als `text.txt` speichern. Bei kurzen Texten kann das Paket
+und den Originaltext anzeigen, kopieren oder speichern. Die Datei heißt nach den
+ersten Wörtern des Textes, etwa `Einkaufsliste-für-Samstag.txt`; ohne Wörter
+`text.txt`. Bei kurzen Texten kann das Paket
 größer sein; die Anzeige zeigt den tatsächlichen Unterschied. Diese Option
 gibt es auch in Android. Für direktes Tippen in andere Anwendungen bleibt sie aus.
 

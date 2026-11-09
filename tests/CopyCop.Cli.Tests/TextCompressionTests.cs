@@ -13,8 +13,16 @@ internal static class TextCompressionTests
         check(packed.Error is null && packed.Text.Length < source.Length && packed.Hint.Contains("weniger"),
             "text mode reports actual smaller transfer with compression");
         var file = CopyCopBundle.Read(packed.Text).Single();
-        check(file.Name == "text.txt" && file.Data.SequenceEqual(Encoding.UTF8.GetBytes(source)),
+        check(file.Name == "Original-Grüße-你好.txt" && file.Data.SequenceEqual(Encoding.UTF8.GetBytes(source)),
             "compressed text preserves original Unicode, BOM, quotes, CRLF and tabs");
+        check(packed.Hint.Contains(file.Name), "hint names the packaged text file");
+        check(TextFileName.FromText("\n\n  Hallo Welt, wie geht es?") == "Hallo-Welt-wie.txt",
+            "text file name uses the first words of the first non-empty line");
+        check(TextFileName.FromText("!!! ???\n") == TextFileName.Fallback && TextFileName.FromText("") == TextFileName.Fallback,
+            "text without words keeps the fallback name");
+        check(TextFileName.FromText("con") == TextFileName.Fallback, "reserved device names fall back");
+        check(TextFileName.FromText(new string('x', 100)) == new string('x', 40) + ".txt", "long first words are shortened");
+        check(TextFileName.FromText("😀😀😀 " + new string('ä', 50)).Length <= 44, "name length is bounded for any Unicode text");
         check(TextCapacity.Assess(packed.Text, false).CanTransfer,
             "Unicode original has a keyboard-safe prepared transfer");
         check(ReferenceEquals(packed, preparation.Prepare(source, true)), "unchanged text reuses its prepared package");

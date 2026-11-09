@@ -6,31 +6,42 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <title>CopyCop · Paket empfangen und entpacken</title>
 <style>
-:root{color-scheme:dark;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#eaf0fc;background:#090e1b;line-height:1.55}*{box-sizing:border-box}body{margin:0}main{max-width:1000px;margin:auto;padding:34px 28px 54px}header{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{display:flex;gap:12px;align-items:center;font-weight:750;letter-spacing:2px}.mark{display:grid;place-items:center;width:38px;height:38px;background:#63e6a5;color:#092518;border-radius:11px;font-size:21px;letter-spacing:-4px;padding-right:4px}.badge{border:1px solid #28453e;border-radius:99px;color:#83e9b4;padding:6px 12px;font-size:12px}.hero{padding:46px 0 30px;max-width:820px}.eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;color:#8ba9ed;text-transform:uppercase}h1{font-size:clamp(30px,4.5vw,50px);line-height:1.12;margin:12px 0 18px;letter-spacing:-1.8px}h1 span{color:#63e6a5}.intro{max-width:740px;color:#a3b1cb;font-size:16px;margin:0}.steps{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 0;font-size:12px;color:#9caecb}.steps span{border:1px solid #24314a;border-radius:8px;padding:6px 10px}.grid{display:grid;grid-template-columns:1fr;gap:22px;align-items:start}.card{border:1px solid #27334b;background:#111a2c;border-radius:18px;padding:24px;min-width:0}.card-header{display:flex;gap:14px;align-items:flex-start;margin-bottom:20px}.number{font-size:13px;border:1px solid #30415f;border-radius:9px;padding:5px 9px;color:#9ebaff}h2{font-size:21px;line-height:1.3;margin:0 0 6px}p{margin:0 0 12px}.muted{color:#9cabc4;font-size:13px}.filepick{position:relative;display:block;text-align:center;border:1px dashed #425575;border-radius:12px;background:#0d1525;padding:22px 12px;cursor:pointer;margin-bottom:12px}.filepick strong{display:block;font-size:15px}.filepick span{font-size:12px;color:#96a7c3}.filepick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}.filepick:focus-within{outline:2px solid #a8c2ff;outline-offset:2px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.row+.row{margin-top:10px}label.check{display:flex;gap:8px;align-items:center;font-size:13px;color:#b4c1d7;margin:12px 0 18px}button,.button{font:inherit;font-weight:650;font-size:13px;background:#5b7cfa;color:white;border:1px solid transparent;border-radius:9px;padding:11px 15px;cursor:pointer;display:inline-block;text-decoration:none}button.secondary,.button.secondary{background:#1a2941;border-color:#354967;color:#dce6fa}button:disabled{opacity:.4;cursor:not-allowed}button:hover:enabled,.button:hover{filter:brightness(1.12)}button:focus-visible,a:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #a8c2ff;outline-offset:3px}textarea{font:12px/1.5 Consolas,monospace;display:block;width:100%;min-height:280px;border:1px solid #354661;border-radius:11px;background:#0a1221;color:#dfeaff;padding:14px;resize:vertical;white-space:pre;overflow:auto;tab-size:4;margin:12px 0}textarea::placeholder{color:#798cae}select{font:inherit;font-size:13px;color:#eaf0fc;background:#142139;border:1px solid #354967;border-radius:8px;padding:8px;max-width:100%}.status{font-size:13px;color:#abc0de;margin:14px 0 0;overflow-wrap:anywhere}.status.error{color:#ff9aad}.status.ok{color:#83e9b4}.summary{background:#0d1525;border-radius:11px;padding:13px 15px;color:#b7c9e5;margin-top:16px;font-size:13px}.summary strong{color:#e9f2ff}.list{list-style:none;margin:12px 0;padding:0;max-height:132px;overflow:auto;font:12px/1.7 Consolas,monospace;color:#b9c9df}.list li{overflow-wrap:anywhere}.downloads{margin-top:18px}.download-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #283550;font-size:12px}.download-row span{overflow-wrap:anywhere}.download-row a{color:#9dc3ff;white-space:nowrap}footer{margin-top:24px;padding:18px 2px;color:#8497b5;font-size:12px;border-top:1px solid #25314a}code{font-family:Consolas,monospace;color:#bdcdf3}[hidden]{display:none!important}@media(max-width:800px){main{padding:22px 16px}.hero{padding-top:30px}.grid{grid-template-columns:1fr}.card{padding:20px}header{align-items:flex-start}.badge{font-size:10px}h1{letter-spacing:-1px}}
+:root{color-scheme:light;--bg:#f4f6fb;--card:#fff;--field:#f8fafd;--text:#17213a;--muted:#5d6b85;--line:#dce2ee;--accent:#3b5bdb;--accent-dark:#2c45a8;--green:#138a4d;--green-soft:#e3f6ec;--red:#c42b4b;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text);background:var(--bg);line-height:1.55}*{box-sizing:border-box}body{margin:0;background:var(--bg)}main{max-width:1000px;margin:auto;padding:34px 28px 54px}header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.brand{display:flex;gap:12px;align-items:center;font-weight:750;letter-spacing:2px}.mark{display:grid;place-items:center;width:38px;height:38px;background:var(--green);color:#fff;border-radius:11px;font-size:21px;letter-spacing:-4px;padding-right:4px}.header-actions{display:flex;gap:10px;align-items:center}.badge{border:1px solid #bfe3cf;border-radius:99px;color:var(--green);background:var(--green-soft);padding:6px 12px;font-size:12px}.switch{position:relative;display:inline-flex;align-items:center;gap:9px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:99px;padding:6px 12px 6px 6px;font-size:13px}.switch::before{content:"";width:34px;height:20px;border-radius:99px;background:#cfd6e4;transition:background .15s}.switch::after{content:"";position:absolute;left:9px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff;transition:left .15s}.switch[aria-pressed=true]::before{background:var(--accent)}.switch[aria-pressed=true]::after{left:23px}.hero{padding:42px 0 26px;max-width:820px}.eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase}h1{font-size:clamp(30px,4.5vw,48px);line-height:1.12;margin:12px 0 18px;letter-spacing:-1.5px}h1 span{color:var(--green)}.intro{max-width:740px;color:var(--muted);font-size:16px;margin:0}.steps{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 0;font-size:12px;color:var(--muted)}.steps span{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 10px}.card{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:24px;min-width:0;box-shadow:0 1px 3px rgba(23,33,58,.05)}.card-header{display:flex;gap:14px;align-items:flex-start;margin-bottom:20px}.number{font-size:13px;border:1px solid var(--line);border-radius:9px;padding:5px 9px;color:var(--accent)}h2{font-size:21px;line-height:1.3;margin:0 0 6px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:13px}.filepick{position:relative;display:block;text-align:center;border:1px dashed #b9c3d6;border-radius:12px;background:var(--field);padding:13px 12px;cursor:pointer;margin:16px 0 12px}.filepick strong{display:block;font-size:15px}.filepick span{font-size:12px;color:var(--muted)}.filepick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}.filepick:focus-within{outline:2px solid var(--accent);outline-offset:2px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}button,.button{font:inherit;font-weight:650;font-size:13px;background:var(--accent);color:#fff;border:1px solid transparent;border-radius:9px;padding:10px 15px;cursor:pointer;display:inline-block;text-decoration:none}button.secondary,.button.secondary{background:var(--card);border-color:var(--line);color:var(--text)}button.small,.button.small{padding:6px 11px;font-size:12px}button:disabled{opacity:.4;cursor:not-allowed}button:hover:enabled,.button:hover{filter:brightness(1.06)}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}textarea{font:12px/1.5 Consolas,monospace;display:block;width:100%;min-height:260px;border:1px solid var(--line);border-radius:11px;background:var(--field);color:var(--text);padding:14px;resize:vertical;white-space:pre;overflow:auto;tab-size:4;margin:12px 0}textarea::placeholder{color:#8a97ad}.status{font-size:13px;color:var(--muted);margin:14px 0 0;overflow-wrap:anywhere}.status.error{color:var(--red)}.status.ok{color:var(--green)}.summary{background:var(--field);border:1px solid var(--line);border-radius:11px;padding:13px 15px;color:var(--muted);margin-top:16px;font-size:13px}.downloads{margin-top:18px}.download-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13px}.download-row>span{overflow-wrap:anywhere}.download-row .row{flex-wrap:nowrap;gap:6px}.viewer{margin-top:18px;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--field)}.viewer-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.viewer-head strong{overflow-wrap:anywhere}.viewer textarea{background:var(--card);min-height:320px;white-space:pre-wrap;margin-bottom:0}.viewer img{display:block;max-width:100%;max-height:70vh;margin:12px auto 0;border-radius:8px;background:repeating-conic-gradient(#e9edf4 0 25%,#fff 0 50%) 0 0/16px 16px}footer{margin-top:24px;padding:18px 2px;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}code{font-family:Consolas,monospace}[hidden]{display:none!important}
+.mask{position:fixed;inset:0;z-index:10;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}.mask-box{width:min(440px,100%);text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px}.mask-title{font-size:22px;font-weight:700;letter-spacing:-.4px;margin:0}.spinner{width:44px;height:44px;border-radius:50%;border:4px solid #dfe5f0;border-top-color:var(--accent);animation:spin 1s linear infinite}.mask.done .spinner{animation:none;border-color:var(--green)}@keyframes spin{to{transform:rotate(360deg)}}.arm{width:150px;height:150px;border-radius:50%;background:var(--accent);color:#fff;font-size:15px;font-weight:700;border:none;box-shadow:0 9px 0 var(--accent-dark),0 14px 24px rgba(44,69,168,.25);transform:translateY(0);transition:transform .08s,box-shadow .08s,background .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px}.arm:hover:enabled{filter:none}.arm[aria-pressed=true]{background:var(--green);transform:translateY(8px);box-shadow:0 1px 0 #0d6b3b,inset 0 4px 10px rgba(0,0,0,.25)}.arm-light{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.45)}.arm[aria-pressed=true] .arm-light{background:#b6f5d2;box-shadow:0 0 10px #b6f5d2}.bar{width:100%;height:12px;border-radius:99px;background:#e2e7f1;overflow:hidden}.bar>div{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .2s}.mask.done .bar>div{background:var(--green)}.bar.busy>div{width:35%!important;animation:slide 1.3s ease-in-out infinite}@keyframes slide{from{transform:translateX(-100%)}to{transform:translateX(290%)}}.mask-text{color:var(--muted);font-size:14px;margin:0;min-height:44px}.mask-text.error{color:var(--red)}.mask-off{position:absolute;top:16px;right:16px}body.masked{overflow:hidden}body.masked #received{color:transparent;caret-color:transparent}body.masked #received::placeholder{color:transparent}@media(max-width:800px){main{padding:22px 16px}.hero{padding-top:28px}.card{padding:18px}.badge{font-size:10px}h1{letter-spacing:-1px}.download-row{flex-wrap:wrap}}
 </style>
 </head>
 <body>
 <main>
-<header><div class="brand"><span class="mark" aria-hidden="true">CC</span> COPYCOP</div><span class="badge">● Lokal · Ohne Upload</span></header>
+<header><div class="brand"><span class="mark" aria-hidden="true">CC</span> COPYCOP</div><div class="header-actions"><button id="mask-toggle" class="switch" type="button" aria-pressed="false">Maske</button><span class="badge">● Lokal · Ohne Upload</span></div></header>
 <section class="hero">
 <div class="eyebrow">Der Empfänger für dein CopyCop-Paket</div>
 <h1>Deine Dateien.<br><span>Wieder vollständig.</span></h1>
-<p class="intro">CopyCop tippt dein Paket hier ein. Diese Seite prüft die Übertragung und stellt die ursprünglichen Dateien wieder her. Vorbereitet wird das Paket in der Desktop- oder Android-App.</p>
-<div class="steps"><span>01 &nbsp; Cursor ins Empfangsfeld</span><span>02 &nbsp; Alle Teile tippen lassen</span><span>03 &nbsp; Prüfen &amp; entpacken</span></div>
+<p class="intro">CopyCop tippt dein Paket oder normalen Text hier ein. Diese Seite prüft Pakete und stellt die ursprünglichen Dateien wieder her. Vorbereitet wird das Paket in der Desktop- oder Android-App.</p>
+<div class="steps"><span>01 &nbsp; Cursor ins Empfangsfeld oder Maske an</span><span>02 &nbsp; Alle Teile tippen lassen</span><span>03 &nbsp; Anzeigen, kopieren oder speichern</span></div>
 </section>
-<div class="grid">
 <section class="card" aria-labelledby="receive-title">
-<div class="card-header"><span class="number">↓</span><div><h2 id="receive-title">Paket empfangen</h2><p class="muted">Hier den Cursor platzieren und alle Teile mit CopyCop tippen lassen. Die Reihenfolge ist egal.</p></div></div>
+<div class="card-header"><span class="number">↓</span><div><h2 id="receive-title">Paket empfangen</h2><p class="muted">Hier den Cursor platzieren und alle Teile mit CopyCop tippen lassen. Die Reihenfolge ist egal. Normaler Text ohne Paket wird erkannt.</p></div></div>
 <label for="received" class="muted">Empfangener Text</label>
-<textarea id="received" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="COPYCOP/1 …&#10;&#10;Hier tippt CopyCop dein Paket ein."></textarea>
-<div class="row"><button id="unpack">Prüfen &amp; entpacken</button><button id="clear" class="secondary">Leeren</button></div>
-<label class="filepick" style="margin-top:16px;padding:13px"><strong>Oder .copycop-Dateien laden</strong><span>Ein Paket oder seine einzelnen Teile</span><input id="receive-files" type="file" multiple accept=".copycop,.txt" aria-label="Empfangenes CopyCop-Paket öffnen"></label>
+<textarea id="received" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="COPYCOP/1 …&#10;&#10;Hier tippt CopyCop dein Paket oder deinen Text ein."></textarea>
+<div class="row"><button id="unpack" type="button">Prüfen &amp; entpacken</button><button id="copy-text" type="button" hidden>Text kopieren</button><button id="clear" class="secondary" type="button">Leeren</button></div>
+<label class="filepick"><strong>Oder .copycop-Dateien laden</strong><span>Ein Paket oder seine einzelnen Teile</span><input id="receive-files" type="file" multiple accept=".copycop,.txt" aria-label="Empfangenes CopyCop-Paket öffnen"></label>
 <p id="receive-status" class="status" role="status">Noch kein Paket empfangen.</p>
-<div id="restored" hidden><div id="receive-summary" class="summary"></div><div class="row" style="margin-top:14px"><a id="save-zip" class="button" download="copycop-dateien.zip">Alle Dateien als ZIP</a></div><div id="downloads" class="downloads"></div></div>
-</section>
+<div id="restored" hidden><div id="receive-summary" class="summary"></div><div class="row" style="margin-top:14px"><a id="save-zip" class="button secondary" download="copycop-dateien.zip">Alle Dateien als ZIP</a></div><div id="downloads" class="downloads"></div>
+<div id="viewer" class="viewer" hidden><div class="viewer-head"><strong id="viewer-name"></strong><div class="row"><button id="viewer-copy" type="button" class="small">Kopieren</button><a id="viewer-save" class="button secondary small">Speichern</a><button id="viewer-close" type="button" class="secondary small">Schließen</button></div></div><textarea id="viewer-text" readonly spellcheck="false" aria-label="Dateiinhalt"></textarea><img id="viewer-image" alt=""></div>
 </div>
-<footer>Diese HTML-Datei funktioniert lokal in einem aktuellen Browser, auch ohne Internet. Keine Dateien verlassen deinen Rechner. Grenzen: 256 Dateien, 16 MiB entpackt, 4 MiB Übertragungstext. ZIP-Dateien nach dem Download im Dateimanager entpacken. CopyCop speichert jeweils einen Teil; vor V den Cursor im Empfangsfeld platzieren.</footer>
+</section>
+<footer>Diese HTML-Datei funktioniert lokal in einem aktuellen Browser, auch ohne Internet. Keine Dateien verlassen deinen Rechner. Grenzen: 256 Dateien, 16 MiB entpackt, 4 MiB Übertragungstext. CopyCop speichert jeweils einen Teil; vor V den Cursor ins Empfangsfeld setzen oder in der Maske den Knopf drücken. Die Maske verdeckt den getippten Text und zeigt nur den Fortschritt; Esc schaltet sie aus.</footer>
 </main>
+<div id="mask" class="mask" hidden role="dialog" aria-modal="true" aria-labelledby="mask-title">
+<button id="mask-off" class="secondary small mask-off" type="button">Maske aus · Esc</button>
+<div class="mask-box">
+<div class="spinner" aria-hidden="true"></div>
+<p id="mask-title" class="mask-title">Wird geladen …</p>
+<button id="mask-arm" class="arm" type="button" aria-pressed="false"><span class="arm-light" aria-hidden="true"></span><span id="mask-arm-label">Bereit machen</span></button>
+<div id="mask-bar" class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-labelledby="mask-title"><div></div></div>
+<p id="mask-text" class="mask-text" role="status">Knopf drücken, dann V am CopyCop.</p>
+</div>
+</div>
 <script id="copycop-codec">
 "use strict";
 globalThis.CopyCopCodec = (() => {
@@ -54,20 +65,39 @@ globalThis.CopyCopCodec = (() => {
     let transform;try{transform=new DecompressionStream("deflate-raw");}catch{fail("Dieser Browser unterstützt das Entpacken noch nicht. Bitte einen aktuellen Browser oder copycop-cli verwenden.");}
     return readLimited(new Blob([data]).stream().pipeThrough(transform),size);
   }
+  const HEADER = "COPYCOP/1 ([0-9a-fA-F]{64}) ([1-9][0-9]{0,3})/([1-9][0-9]{0,3})(?: ([1-9][0-9]{0,6}))?\\r?\\n";
+  function looksLikePackage(text){const start=text.trimStart();return start.startsWith("COPYCOP/") || (start.length>0 && "COPYCOP/".startsWith(start));}
   function collect(text){
     if(text.length>MAX_TEXT)fail("Der Übertragungstext ist größer als 4 MiB.");text=text.trim();
-    const pattern=/COPYCOP\/1 ([0-9a-fA-F]{64}) ([1-9][0-9]{0,3})\/([1-9][0-9]{0,3})\r?\n([A-Za-z0-9+/=\r\n\t ]+?)\r?\nENDCOPYCOP(?:\r?\n|$)/gy;
+    const pattern=new RegExp(HEADER+"([A-Za-z0-9+/=\\r\\n\\t ]+?)\\r?\\nENDCOPYCOP(?:\\r?\\n|$)","gy");
     let position=0,hash=null,total=0;const chunks=new Map();
     while(position<text.length){pattern.lastIndex=position;const match=pattern.exec(text);if(!match)fail("Unvollständiger oder ungültiger Teil. Bitte bis ENDCOPYCOP übertragen (Format Version 1).");
       const current=match[1].toLowerCase(),number=Number(match[2]),count=Number(match[3]);
       if(count>4096 || number>count)fail("Ungültige Teilnummer.");
       if(hash!==null && (hash!==current || total!==count))fail("Die Teile gehören zu unterschiedlichen Paketen.");
-      hash=current;total=count;const data=match[4].replace(/[ \t\r\n]/g,"");
+      hash=current;total=count;const data=match[5].replace(/[ \t\r\n]/g,"");
+      if(match[4]!==undefined && Number(match[4])!==data.length)fail(`Teil ${number} ist unvollständig oder zu lang. Bitte erneut übertragen.`);
       if(chunks.has(number) && chunks.get(number)!==data)fail(`Teil ${number} wurde mit unterschiedlichem Inhalt übertragen.`);
       chunks.set(number,data);position=pattern.lastIndex;while(/[ \t\r\n]/.test(text[position]||"!") && position<text.length)position++;
     }
     const missing=[];for(let i=1;i<=total;i++)if(!chunks.has(i))missing.push(i);
     return{hash,total,chunks,missing};
+  }
+  // Lenient live view of text that is still being typed; decode() remains the strict check.
+  function progress(text){
+    if(!text.trim())return{kind:"empty"};
+    if(!looksLikePackage(text))return{kind:"text",chars:text.length};
+    const head=new RegExp("^"+HEADER),done=new Set();let total=0,current=null,error=null;
+    for(const segment of text.trimStart().split(/(?=COPYCOP\/)/)){
+      const match=head.exec(segment);current=null;
+      if(!match){if(/\n/.test(segment))error="Unbekannter oder beschädigter Paketkopf.";else current={number:0,size:0,have:0};continue;}
+      const number=Number(match[2]),body=segment.slice(match[0].length);total=Number(match[3]);
+      if(/\nENDCOPYCOP/.test("\n"+body))done.add(number);
+      else current={number,size:match[4]?Number(match[4]):0,have:body.replace(/[^A-Za-z0-9+/=]/g,"").length};
+    }
+    const missing=[];for(let i=1;i<=total;i++)if(!done.has(i))missing.push(i);
+    const fraction=current?(current.size?Math.min(1,current.have/current.size):null):1;
+    return{kind:"package",total,done:done.size,missing,current,fraction,error,complete:total>0 && !missing.length && !current};
   }
   async function decode(text){const result=collect(text);if(!result.total || result.missing.length)fail(`Paket unvollständig: ${result.chunks.size} von ${result.total} Teilen vorhanden.`);
     const archive=unbase64(Array.from({length:result.total},(_,i)=>result.chunks.get(i+1)).join(""));
@@ -97,31 +127,120 @@ globalThis.CopyCopCodec = (() => {
       if(data.length!==entry.size || crc32(data)!==entry.crc)fail("Datei beschädigt: "+entry.name);files.push({name:entry.name,data});}
     return files;
   }
-  return{decode,unzip,collect,crc32,MAX_TEXT,MAX_RAW,MAX_FILES};
+  // Text for display and copying; null for binary content.
+  function asText(data){if(data.includes(0))return null;try{return decoder.decode(data).replace(/^﻿/,"");}catch{return null;}}
+  const IMAGE_TYPES={png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",bmp:"image/bmp",svg:"image/svg+xml",ico:"image/x-icon",avif:"image/avif"};
+  function imageType(name){return IMAGE_TYPES[name.split(".").at(-1).toLowerCase()]||null;}
+  function dataUrl(data,type){return `data:${type};base64,${base64(data)}`;}
+  return{decode,unzip,collect,progress,looksLikePackage,asText,imageType,dataUrl,crc32,MAX_TEXT,MAX_RAW,MAX_FILES};
 })();
 </script>
 <script>
 "use strict";
-const $=id=>document.getElementById(id),codec=CopyCopCodec;
-let receiveVersion=0,receiveUrls=[],receiveTimer;
+const $=id=>document.getElementById(id),codec=CopyCopCodec,received=$("received");
+let receiveVersion=0,receiveUrls=[],receiveTimer,liveTimer,idleTimer,restoredFiles=[],viewerFile=null,unpackedText=null,masked=false;
 const format=n=>new Intl.NumberFormat("de-DE").format(n);
 function status(id,text,type=""){const node=$(id);node.textContent=text;node.className="status "+type;}
 function revoke(urls){for(const url of urls)URL.revokeObjectURL(url);urls.length=0;}
 function url(data,type,urls){const value=URL.createObjectURL(new Blob([data],{type}));urls.push(value);return value;}
-function invalidateReceive(){receiveVersion++;revoke(receiveUrls);$("restored").hidden=true;$("downloads").replaceChildren();$("unpack").disabled=false;}
-function progress(){const text=$("received").value;if(!text.trim()){status("receive-status","Noch kein Paket empfangen.");return;}try{const value=codec.collect(text);status("receive-status",value.missing.length?`${value.chunks.size} von ${value.total} Teilen. Es fehlen: ${value.missing.slice(0,20).join(", ")}${value.missing.length>20?" …":""}`:`${value.total} Teil(e) vollständig eingelesen. Jetzt prüfen und entpacken.`);}catch(error){status("receive-status",error.message);}}
-$("received").addEventListener("input",()=>{invalidateReceive();clearTimeout(receiveTimer);receiveTimer=setTimeout(progress,400);});
-$("clear").addEventListener("click",()=>{clearTimeout(receiveTimer);invalidateReceive();$("received").value="";$("receive-files").value="";progress();$("received").focus();});
-$("receive-files").addEventListener("change",async e=>{clearTimeout(receiveTimer);invalidateReceive();const version=receiveVersion,files=Array.from(e.target.files);if(!files.length)return;
-  try{if(files.reduce((n,f)=>n+f.size,0)>codec.MAX_TEXT)throw new Error("Der Übertragungstext ist größer als 4 MiB.");const texts=[];for(const file of files){texts.push(await file.text());if(version!==receiveVersion)return;}$("received").value=texts.join("\n");progress();}catch(error){if(version===receiveVersion)status("receive-status",error.message,"error");}});
-$("unpack").addEventListener("click",async()=>{clearTimeout(receiveTimer);invalidateReceive();const version=receiveVersion,text=$("received").value;$("unpack").disabled=true;status("receive-status","Teile und Prüfsumme werden geprüft …");
-  try{const archive=await codec.decode(text),files=await codec.unzip(archive);if(version!==receiveVersion)return;
-    $("save-zip").href=url(archive,"application/zip",receiveUrls);
-    for(const file of files){const row=document.createElement("div");row.className="download-row";const label=document.createElement("span");label.textContent=`${file.name} · ${format(file.data.length)} Bytes`;const link=document.createElement("a");link.textContent="Speichern";link.setAttribute("aria-label",file.name+" speichern");link.download=file.name.split("/").at(-1);link.href=url(file.data,"application/octet-stream",receiveUrls);row.append(label,link);$("downloads").append(row);}
-    $("receive-summary").textContent=`${files.length} Dateien · ${format(files.reduce((n,f)=>n+f.data.length,0))} Bytes wiederhergestellt. Das ZIP erhält alle relativen Pfade.`;$("restored").hidden=false;status("receive-status","Prüfsumme und Dateiinhalte sind gültig. Bereit zum Speichern.","ok");
-  }catch(error){if(version===receiveVersion)status("receive-status",error.message,"error");}finally{if(version===receiveVersion)$("unpack").disabled=false;}
+function invalidateReceive(){receiveVersion++;revoke(receiveUrls);restoredFiles=[];unpackedText=null;closeViewer();$("restored").hidden=true;$("downloads").replaceChildren();$("unpack").disabled=false;}
+
+async function copyText(text,button){
+  const label=button.textContent;let copied=false;
+  try{await navigator.clipboard.writeText(text);copied=true;}catch{
+    const helper=document.createElement("textarea");helper.value=text;helper.setAttribute("readonly","");helper.style.cssText="position:fixed;top:0;left:-9999px;opacity:0";document.body.append(helper);helper.select();
+    try{copied=document.execCommand("copy");}catch{copied=false;}helper.remove();}
+  button.textContent=copied?"Kopiert ✓":"Kopieren nicht möglich";setTimeout(()=>{button.textContent=label;},1600);
+}
+
+function closeViewer(){viewerFile=null;$("viewer").hidden=true;$("viewer-text").value="";$("viewer-image").removeAttribute("src");}
+function openViewer(file){
+  viewerFile=file;const text=codec.asText(file.data),type=codec.imageType(file.name);
+  $("viewer-name").textContent=file.name;$("viewer-save").href=file.url;$("viewer-save").download=file.name.split("/").at(-1);
+  $("viewer-copy").hidden=text===null;$("viewer-text").hidden=text===null;$("viewer-image").hidden=true;
+  if(text!==null){$("viewer-text").value=text;}
+  if(type){$("viewer-image").src=codec.dataUrl(file.data,type);$("viewer-image").alt=file.name;$("viewer-image").hidden=false;$("viewer-text").hidden=true;$("viewer-copy").hidden=true;}
+  $("viewer").hidden=false;if(!masked)$("viewer").scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+$("viewer-close").addEventListener("click",closeViewer);
+$("viewer-copy").addEventListener("click",e=>{if(viewerFile)copyText(codec.asText(viewerFile.data)??"",e.currentTarget);});
+$("copy-text").addEventListener("click",e=>copyText(received.value,e.currentTarget));
+
+function actionButton(text,handler,secondary=true){const button=document.createElement("button");button.type="button";button.className="small"+(secondary?" secondary":"");button.textContent=text;button.addEventListener("click",handler);return button;}
+function showFiles(archive,files){
+  $("save-zip").href=url(archive,"application/zip",receiveUrls);
+  restoredFiles=files.map(file=>({...file,url:url(file.data,"application/octet-stream",receiveUrls)}));
+  for(const file of restoredFiles){
+    const row=document.createElement("div");row.className="download-row";const label=document.createElement("span");label.textContent=`${file.name} · ${format(file.data.length)} Bytes`;
+    const actions=document.createElement("div");actions.className="row";const text=codec.asText(file.data);
+    if(text!==null || codec.imageType(file.name))actions.append(actionButton("Anzeigen",()=>openViewer(file)));
+    if(text!==null && !codec.imageType(file.name))actions.append(actionButton("Kopieren",e=>copyText(text,e.currentTarget)));
+    const link=document.createElement("a");link.className="button small";link.textContent="Speichern";link.setAttribute("aria-label",file.name+" speichern");link.download=file.name.split("/").at(-1);link.href=file.url;actions.append(link);
+    row.append(label,actions);$("downloads").append(row);
+  }
+  $("receive-summary").textContent=`${files.length} ${files.length===1?"Datei":"Dateien"} · ${format(files.reduce((n,f)=>n+f.data.length,0))} Bytes wiederhergestellt. Das ZIP erhält alle relativen Pfade.`;$("restored").hidden=false;
+  const only=restoredFiles.length===1?restoredFiles[0]:null;
+  if(only && codec.asText(only.data)!==null){unpackedText=only;openViewer(only);}
+}
+
+async function unpack(){
+  clearTimeout(receiveTimer);invalidateReceive();const version=receiveVersion,text=received.value;$("unpack").disabled=true;status("receive-status","Teile und Prüfsumme werden geprüft …");
+  try{const archive=await codec.decode(text),files=await codec.unzip(archive);if(version!==receiveVersion)return false;
+    showFiles(archive,files);status("receive-status","Prüfsumme und Dateiinhalte sind gültig. Anzeigen, kopieren oder speichern.","ok");return true;
+  }catch(error){if(version===receiveVersion)status("receive-status",error.message,"error");throw error;}finally{if(version===receiveVersion)$("unpack").disabled=false;}
+}
+$("unpack").addEventListener("click",()=>{unpack().catch(()=>{});});
+
+function progress(){
+  const text=received.value,isText=text.trim() && !codec.looksLikePackage(text);
+  $("copy-text").hidden=!isText;$("unpack").hidden=!!isText;
+  if(!text.trim()){status("receive-status","Noch kein Paket empfangen.");return;}
+  if(isText){status("receive-status",`Normaler Text ohne Paket · ${format(text.length)} Zeichen. Er kann direkt kopiert werden.`,"ok");return;}
+  try{const value=codec.collect(text);status("receive-status",value.missing.length?`${value.chunks.size} von ${value.total} Teilen. Es fehlen: ${value.missing.slice(0,20).join(", ")}${value.missing.length>20?" …":""}`:`${value.total} Teil(e) vollständig eingelesen. Wird geprüft …`);
+    if(!value.missing.length && value.total)unpack().then(()=>maskUpdate(),()=>maskUpdate());}catch(error){status("receive-status",error.message);}
+}
+
+// Mask: hides the typed text and shows only a loading screen with progress.
+function armed(){return document.activeElement===received && document.hasFocus();}
+function setMaskText(text,type=""){$("mask-text").textContent=text;$("mask-text").className="mask-text "+type;}
+function setBar(fraction){const bar=$("mask-bar");bar.classList.toggle("busy",fraction===null);bar.firstElementChild.style.width=fraction===null?"":Math.floor(fraction*100)+"%";if(fraction===null)bar.removeAttribute("aria-valuenow");else bar.setAttribute("aria-valuenow",String(Math.floor(fraction*100)));}
+function maskUpdate(){
+  if(!masked)return;const on=armed(),arm=$("mask-arm");arm.setAttribute("aria-pressed",String(on));$("mask-arm-label").textContent=on?"Empfang bereit":"Bereit machen";
+  const value=codec.progress(received.value);let done=false;
+  if(value.kind==="empty"){setBar(0);setMaskText(on?"Jetzt V am CopyCop drücken.":"Knopf drücken, dann V am CopyCop.");}
+  else if(value.kind==="text"){const idle=!idleTimer;done=idle;setBar(idle?1:null);setMaskText(idle?`Empfangen · ${format(value.chars)} Zeichen. Maske ausschalten zum Anzeigen.`:`Empfange … ${format(value.chars)} Zeichen`,idle?"":"");}
+  else if(value.error){setBar(0);setMaskText(value.error,"error");}
+  else if(value.complete){const ok=$("receive-status").classList.contains("ok"),failed=$("receive-status").classList.contains("error");done=ok;setBar(1);
+    setMaskText(ok?(unpackedText?`Fertig · ${unpackedText.name}. Maske ausschalten zum Anzeigen.`:"Fertig. Maske ausschalten zum Anzeigen."):failed?$("receive-status").textContent:"Wird geprüft …",failed?"error":"");}
+  else if(value.current){const part=value.current.number?`Teil ${value.current.number} von ${value.total}`:"Paket";setBar(value.fraction);
+    setMaskText(value.fraction===null?`${part} · ${format(value.current.have)} Zeichen`:`${part} · ${Math.floor(value.fraction*100)} %`);}
+  else{setBar(1);setMaskText(`${value.done} von ${value.total} Teilen empfangen. Nächsten Teil laden und V drücken.`+(on?"":" Vorher Knopf drücken."));}
+  $("mask").classList.toggle("done",done);$("mask-title").textContent=done?"Abgeschlossen":"Wird geladen …";
+}
+function arm(){const end=received.value.length;received.focus({preventScroll:true});received.setSelectionRange(end,end);maskUpdate();}
+function setMask(on,remember=true){
+  masked=on;$("mask").hidden=!on;document.body.classList.toggle("masked",on);$("mask-toggle").setAttribute("aria-pressed",String(on));
+  if(remember){try{localStorage.setItem("copycop-mask",on?"1":"0");}catch{}}
+  if(on)maskUpdate();else if(document.activeElement===received)received.blur();
+}
+$("mask-toggle").addEventListener("click",()=>setMask(!masked));
+$("mask-off").addEventListener("click",()=>setMask(false));
+$("mask-arm").addEventListener("mousedown",e=>{e.preventDefault();arm();});
+$("mask-arm").addEventListener("click",arm);
+document.addEventListener("keydown",e=>{if(e.key==="Escape" && masked){e.preventDefault();setMask(false);}});
+for(const [target,name] of [[received,"focus"],[received,"blur"],[window,"focus"],[window,"blur"]])target.addEventListener(name,()=>setTimeout(maskUpdate,0));
+
+received.addEventListener("input",()=>{
+  invalidateReceive();clearTimeout(receiveTimer);receiveTimer=setTimeout(progress,400);
+  clearTimeout(idleTimer);idleTimer=setTimeout(()=>{idleTimer=undefined;maskUpdate();},1500);
+  if(!liveTimer)liveTimer=setTimeout(()=>{liveTimer=undefined;maskUpdate();},120);
 });
+$("clear").addEventListener("click",()=>{clearTimeout(receiveTimer);invalidateReceive();received.value="";$("receive-files").value="";progress();received.focus();});
+$("receive-files").addEventListener("change",async e=>{clearTimeout(receiveTimer);invalidateReceive();const version=receiveVersion,files=Array.from(e.target.files);if(!files.length)return;
+  try{if(files.reduce((n,f)=>n+f.size,0)>codec.MAX_TEXT)throw new Error("Der Übertragungstext ist größer als 4 MiB.");const texts=[];for(const file of files){texts.push(await file.text());if(version!==receiveVersion)return;}received.value=texts.join("\n");progress();}catch(error){if(version===receiveVersion)status("receive-status",error.message,"error");}});
 window.addEventListener("beforeunload",()=>{revoke(receiveUrls);});
+let rememberedMask=false;try{rememberedMask=localStorage.getItem("copycop-mask")==="1";}catch{}
+setMask(rememberedMask,false);
 </script>
 </body>
 </html>

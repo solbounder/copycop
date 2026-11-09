@@ -30,13 +30,14 @@ public sealed class TextTransferPreparation
             }
             if (Utf8.GetByteCount(source) > CopyCopBundle.MaximumExpandedBytes)
                 throw new InvalidDataException("Der Text ist größer als 16 MiB.");
-            var bundle = CopyCopBundle.Create([new BundleFile("text.txt", Utf8.GetBytes(source))], compress: true);
+            var fileName = TextFileName.FromText(source);
+            var bundle = CopyCopBundle.Create([new BundleFile(fileName, Utf8.GetBytes(source))], compress: true);
             var originalCharacters = source.ReplaceLineEndings("\n").EnumerateRunes().Count();
             var difference = 100d * (originalCharacters - bundle.Text.Length) / originalCharacters;
             var comparison = difference >= 0 ? $"{difference:N1} % weniger" : $"{-difference:N1} % mehr";
             return Result = new(bundle.Text,
                 $"{originalCharacters:N0} Textzeichen → {bundle.Text.Length:N0} Paketzeichen ({comparison}). "
-                + "Am Ziel in copycop.html entpacken und text.txt speichern. Der Originaltext bleibt erhalten.");
+                + $"Am Ziel in copycop.html empfangen und {fileName} anzeigen, kopieren oder speichern. Der Originaltext bleibt erhalten.");
         }
         catch (Exception exception) when (exception is InvalidDataException or EncoderFallbackException)
         {

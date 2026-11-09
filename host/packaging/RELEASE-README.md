@@ -3,7 +3,8 @@
 **Text komprimieren – Empfang über HTML** ist in Desktop und Android optional
 für eingefügten Text verfügbar. Der Originaltext bleibt im Editor; Paketgröße,
 Ersparnis, Tippdauer und Aufteilung beziehen sich auf die übertragene Fassung.
-Am Ziel in `copycop.html` entpacken und `text.txt` speichern. Für direktes Tippen
+Am Ziel in `copycop.html` empfangen; der Text wird angezeigt und kann kopiert
+oder gespeichert werden (Dateiname aus den ersten Wörtern). Für direktes Tippen
 und zum Übertragen der selbstentpackenden Empfangs-HTML den Haken ausschalten.
 
 - `CopyCop` / `CopyCop.exe`: grafische Oberfläche ohne Konsolenfenster
@@ -36,6 +37,9 @@ Mit „Dateien hinzufügen …“ oder „Ordner hinzufügen …“ die Dateilis
 für Schritt ergänzen. „Paket erstellen“ bündelt die aktuelle Auswahl mit
 optionaler Kompression; „Als .copycop speichern …“ legt sie ab. Auf dem Zielrechner die
 beiliegende `copycop.html` öffnen, alle Teile im Empfangsfeld tippen lassen und
-„Prüfen & entpacken“ wählen. Die HTML-Datei ist ausschließlich der Empfänger
+„Prüfen & entpacken“ wählen; vollständige Pakete werden auch automatisch
+entpackt. Dateien lassen sich anzeigen, kopieren oder speichern. Mit dem
+Schalter „Maske“ zeigt die Seite statt des getippten Textes nur einen
+Ladebildschirm mit Knopf und Fortschrittsbalken; Esc schaltet sie aus. Die HTML-Datei ist ausschließlich der Empfänger
 und funktioniert lokal ohne Upload. Dieselbe Dateiverwaltung bietet die Android-App.
 Die CLI kann mit `pack` und `unpack` ebenfalls Pakete erstellen und entpacken.

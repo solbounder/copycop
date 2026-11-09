@@ -21,7 +21,7 @@ public static class CopyCopBundle
     private const int LineWidth = 120;
     private static readonly UTF8Encoding Utf8 = new(false, true);
     private static readonly Regex FramePattern = new(
-        @"\GCOPYCOP/1 ([0-9a-fA-F]{64}) ([1-9][0-9]{0,3})/([1-9][0-9]{0,3})\r?\n([A-Za-z0-9+/=\r\n\t ]+?)\r?\nENDCOPYCOP(?:\r?\n|$)",
+        @"\GCOPYCOP/1 ([0-9a-fA-F]{64}) ([1-9][0-9]{0,3})/([1-9][0-9]{0,3})(?: ([1-9][0-9]{0,6}))?\r?\n([A-Za-z0-9+/=\r\n\t ]+?)\r?\nENDCOPYCOP(?:\r?\n|$)",
         RegexOptions.CultureInvariant, TimeSpan.FromSeconds(2));
 
     public static bool LooksLikeBundle(string text) =>
@@ -46,7 +46,7 @@ public static class CopyCopBundle
             Read(text);
             return text;
         }
-        return Create([new BundleFile("text.txt", Utf8.GetBytes(text))], compress).Text;
+        return Create([new BundleFile(TextFileName.FromText(text), Utf8.GetBytes(text))], compress).Text;
     }
 
     public static async Task<BundleFile> ReadFileAsync(string name, Stream stream,
@@ -92,7 +92,10 @@ public static class CopyCopBundle
                 throw new InvalidDataException("Die Teile gehören nicht zum selben CopyCop-Paket.");
             hash = partHash;
             total = count;
-            var data = string.Concat(match.Groups[4].Value.Where(c => c is not (' ' or '\t' or '\r' or '\n')));
+            var data = string.Concat(match.Groups[5].Value.Where(c => c is not (' ' or '\t' or '\r' or '\n')));
+            if (match.Groups[4].Success
+                && int.Parse(match.Groups[4].Value, System.Globalization.CultureInfo.InvariantCulture) != data.Length)
+                throw new InvalidDataException($"Teil {number} ist unvollständig oder zu lang. Bitte erneut übertragen.");
             if (chunks.TryGetValue(number, out var existing) && existing != data)
                 throw new InvalidDataException($"Teil {number} wurde mit unterschiedlichem Inhalt übertragen.");
             chunks[number] = data;
@@ -143,8 +146,9 @@ public static class CopyCopBundle
         var totalSize = 0;
         for (var index = 0; index < count; index++)
         {
-            var builder = new StringBuilder($"COPYCOP/1 {hash} {index + 1}/{count}\n");
             var end = Math.Min(data.Length, (index + 1) * chunkSize);
+            // The Base64 character count lets receivers show typing progress for this part.
+            var builder = new StringBuilder($"COPYCOP/1 {hash} {index + 1}/{count} {end - index * chunkSize}\n");
             for (var offset = index * chunkSize; offset < end; offset += LineWidth)
                 builder.Append(data, offset, Math.Min(LineWidth, end - offset)).Append('\n');
             builder.Append("ENDCOPYCOP\n");

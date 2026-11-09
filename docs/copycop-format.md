@@ -16,8 +16,11 @@ den Originaltext automatisch und verlustfrei als `text.txt` in einem Paket,
 bevor er auf das Gerät geladen wird. Auch die physische C-Taste nutzt diese
 Einstellung. Der Editor bleibt unverändert; die Anzeige zeigt die tatsächliche
 Paketgröße und Ersparnis, bei kurzen Texten auch einen möglichen Mehrbedarf.
-Aufteilung und Tippdauer gelten für das vorbereitete Paket. Am Ziel mit der
-HTML empfangen und `text.txt` speichern. Ausschalten stellt die direkte
+Aufteilung und Tippdauer gelten für das vorbereitete Paket. Die Textdatei heißt
+nach den ersten (bis zu drei) Wörtern der ersten Zeile mit Text, etwa
+`Einkaufsliste-für-Samstag.txt`, höchstens 40 Zeichen plus `.txt`; ohne
+verwendbare Wörter `text.txt`. Am Ziel mit der HTML empfangen: Der Text wird
+direkt angezeigt und kann kopiert oder gespeichert werden. Ausschalten stellt die direkte
 Textausgabe wieder her. Bereits vorbereitete `.copycop`-Pakete werden nicht
 noch einmal verpackt.
 
@@ -39,9 +42,28 @@ noch einmal verpackt.
    Browser öffnen. Den Cursor in **Paket empfangen** setzen und mit V tippen
    lassen. Das Empfangsfeld zwischen den Teilen nicht leeren. Für jeden weiteren
    Teil wieder am Quellrechner laden und am Ziel ausgeben.
-5. **Prüfen & entpacken** wählen. Einzelne Dateien speichern oder **Alle Dateien
+5. Sind alle Teile da, entpackt die Seite automatisch; **Prüfen & entpacken**
+   startet die Prüfung erneut. Textdateien und Bilder lassen sich **anzeigen**,
+   Textdateien auch **kopieren**. Einzelne Dateien speichern oder **Alle Dateien
    als ZIP** herunterladen und im Dateimanager entpacken. Der ZIP-Download
    erhält Unterordner; ein einzelner Browserdownload verwendet den Basisnamen.
+   Enthält das Paket genau eine Textdatei, wird sie sofort angezeigt.
+
+Normaler Text, der ohne Paket getippt wird, erkennt die Seite selbst: Statt
+„Prüfen & entpacken“ erscheint **Text kopieren**.
+
+### Maske
+
+Der Schalter **Maske** oben rechts legt einen Ladebildschirm über die Seite.
+Der getippte Text bleibt unsichtbar. Den großen Knopf drücken: Er bleibt
+sichtbar eingedrückt und grün, solange das unsichtbare Empfangsfeld die
+Eingaben bekommt. Springt er heraus (etwa nach einem Klick in ein anderes
+Fenster), würde CopyCop ins Leere tippen. Danach V am CopyCop drücken.
+Sichtbar ist nur der Fortschritt: für Pakete Prozent und „Teil x von y“, für
+normalen Text ein laufender Balken mit Zeichenzahl, der nach 1,5 Sekunden ohne
+Eingabe als abgeschlossen gilt. Esc oder **Maske aus** schaltet die Maske ab;
+dann sind Text oder Dateien wie gewohnt zu sehen. Die Seite merkt sich, ob die
+Maske beim nächsten Öffnen an ist.
 
 Die HTML-Datei muss vor der Übertragung auf dem Zielrechner verfügbar sein.
 Sie ist eine komprimierte, selbstentpackende HTML-Datei: In der App über
@@ -116,10 +138,17 @@ physische C-Taste die Übertragung des ausgewählten Teils.
 Eine UTF-8-Datei ohne BOM enthält einen oder mehrere Rahmen:
 
 ```text
-COPYCOP/1 <SHA-256 des vollständigen ZIP-Archivs> <Teilnummer>/<Teilezahl>
+COPYCOP/1 <SHA-256 des vollständigen ZIP-Archivs> <Teilnummer>/<Teilezahl> <Base64-Zeichen dieses Teils>
 <Base64-Abschnitt, Zeilen mit höchstens 120 Zeichen>
 ENDCOPYCOP
 ```
+
+Die Zeichenzahl am Ende der Kopfzeile zählt die Base64-Zeichen des Abschnitts
+ohne Zeilenumbrüche. Empfänger zeigen damit den Tippfortschritt an und weisen
+einen Teil ab, dessen Länge nicht passt. Sie ist optional: Rahmen ohne
+Zeichenzahl werden weiterhin gelesen. Ältere Empfangsseiten und CLIs kennen das
+Feld nicht und lehnen neue Rahmen ab; auf dem Zielrechner dann die aktuelle
+`copycop.html` verwenden.
 
 Die SHA-256-Prüfsumme wird als 64 hexadezimale Zeichen geschrieben. Teilnummern
 beginnen bei 1. Maximal 4096 Teile sind zulässig. Alle Teile eines Pakets tragen
