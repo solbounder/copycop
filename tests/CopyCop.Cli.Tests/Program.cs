@@ -54,8 +54,12 @@ Check(Encoding.UTF8.GetByteCount(new string('ä', 63_232)) == 126_464, "maximum 
 var simpleWorkload = TypingDurationEstimator.Analyze("a");
 Check(simpleWorkload.StrokeCount == 1 && simpleWorkload.AltGrStrokeCount == 0,
     "typing workload regular key");
-Check(simpleWorkload.Estimate(10) == TimeSpan.FromMilliseconds(11),
+Check(simpleWorkload.Estimate(10) == TimeSpan.FromMilliseconds(20),
     "typing duration regular key");
+var shiftWorkload = TypingDurationEstimator.Analyze(")");
+Check(shiftWorkload.ShiftStrokeCount == 1 && shiftWorkload.AltGrStrokeCount == 0
+      && shiftWorkload.Estimate(10) == TimeSpan.FromMilliseconds(95),
+    "typing duration staged Shift");
 var altGrWorkload = TypingDurationEstimator.Analyze("{");
 Check(altGrWorkload.StrokeCount == 1 && altGrWorkload.AltGrStrokeCount == 1,
     "typing workload AltGr");
@@ -63,7 +67,7 @@ Check(altGrWorkload.Estimate(10) == TimeSpan.FromMilliseconds(95),
     "typing duration staged AltGr");
 var deadAltGrWorkload = TypingDurationEstimator.Analyze("~");
 Check(deadAltGrWorkload.StrokeCount == 2 && deadAltGrWorkload.AltGrStrokeCount == 1
-      && deadAltGrWorkload.Estimate(10) == TimeSpan.FromMilliseconds(106),
+      && deadAltGrWorkload.Estimate(10) == TimeSpan.FromMilliseconds(115),
     "typing duration AltGr dead key");
 Check(TypingDurationEstimator.SpeedLevelsMilliseconds.SequenceEqual(
         new[] { 10, 25, 50, 100, 250, 500, 750, 1000 }),

@@ -43,6 +43,15 @@ static bool uses_staged_altgr(copycop_key_stroke_t stroke) {
     return (stroke.modifiers & KEYBOARD_MODIFIER_RIGHTALT) != 0u;
 }
 
+/* Every modifier is pressed before and released after its key, never in the same report. */
+static bool uses_staged_modifier(copycop_key_stroke_t stroke) {
+    return stroke.modifiers != 0u;
+}
+
+static uint32_t modifier_settle_ms(copycop_key_stroke_t stroke) {
+    return uses_staged_altgr(stroke) ? COPYCOP_ALTGR_SETTLE_MS : COPYCOP_SHIFT_SETTLE_MS;
+}
+
 static void request_finish(bool error) {
     pause_requested = false;
     paused = false;
@@ -63,7 +72,7 @@ static bool can_enter_pause_now(void) {
         return true;
     }
     return phase == TYPER_KEY_PRESS
-        && !uses_staged_altgr(current_sequence.strokes[sequence_index]);
+        && !uses_staged_modifier(current_sequence.strokes[sequence_index]);
 }
 
 void typer_init(void) {
@@ -153,7 +162,7 @@ void typer_task(void) {
         }
 
         const copycop_key_stroke_t stroke = current_sequence.strokes[sequence_index];
-        phase = uses_staged_altgr(stroke)
+        phase = uses_staged_modifier(stroke)
             ? TYPER_MODIFIER_PRESS : TYPER_KEY_PRESS;
         next_action = get_absolute_time();
         return;
@@ -179,7 +188,7 @@ void typer_task(void) {
     if (phase == TYPER_MODIFIER_PRESS) {
         if (!copycop_usb_keyboard_press(stroke.modifiers, 0u)) return;
         phase = TYPER_KEY_PRESS;
-        next_action = make_timeout_time_ms(COPYCOP_ALTGR_SETTLE_MS);
+        next_action = make_timeout_time_ms(modifier_settle_ms(stroke));
         return;
     }
 
@@ -187,16 +196,17 @@ void typer_task(void) {
         if (!copycop_usb_keyboard_press(stroke.modifiers, stroke.keycode)) return;
         phase = TYPER_KEY_RELEASE;
         next_action = make_timeout_time_ms(
-            uses_staged_altgr(stroke)
-                ? COPYCOP_ALTGR_KEY_HOLD_MS : COPYCOP_KEY_HOLD_MS);
+            uses_staged_altgr(stroke) ? COPYCOP_ALTGR_KEY_HOLD_MS
+            : uses_staged_modifier(stroke) ? COPYCOP_SHIFT_KEY_HOLD_MS
+            : COPYCOP_KEY_HOLD_MS);
         return;
     }
 
     if (phase == TYPER_KEY_RELEASE) {
-        if (uses_staged_altgr(stroke)) {
+        if (uses_staged_modifier(stroke)) {
             if (!copycop_usb_keyboard_press(stroke.modifiers, 0u)) return;
             phase = TYPER_MODIFIER_RELEASE;
-            next_action = make_timeout_time_ms(COPYCOP_ALTGR_SETTLE_MS);
+            next_action = make_timeout_time_ms(modifier_settle_ms(stroke));
             return;
         }
         if (!copycop_usb_keyboard_release_all()) return;

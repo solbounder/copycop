@@ -70,7 +70,12 @@
 
 #define COPYCOP_SPEED_LEVEL_COUNT         8u
 #define COPYCOP_DEFAULT_SPEED_INDEX       0u
-#define COPYCOP_KEY_HOLD_MS               1u
+/* Remote desktops and VDI clients sample key state and drop 1 ms presses. */
+#define COPYCOP_KEY_HOLD_MS               10u
+/* Shift is pressed alone first so the target never sees the bare key.
+ * 10 ms still produced "9" for ")" on VDI targets; AltGr timing is proven there. */
+#define COPYCOP_SHIFT_SETTLE_MS           35u
+#define COPYCOP_SHIFT_KEY_HOLD_MS         15u
 #define COPYCOP_ALTGR_SETTLE_MS           35u
 #define COPYCOP_ALTGR_KEY_HOLD_MS         15u
 #define COPYCOP_CANCEL_HOLD_MS            800u

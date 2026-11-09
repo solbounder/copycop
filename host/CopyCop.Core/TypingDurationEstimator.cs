@@ -2,16 +2,17 @@ using System.Text;
 
 namespace CopyCop.Core;
 
-public readonly record struct TypingWorkload(long StrokeCount, long AltGrStrokeCount)
+public readonly record struct TypingWorkload(long StrokeCount, long AltGrStrokeCount, long ShiftStrokeCount = 0)
 {
     public TimeSpan Estimate(int interKeyDelayMilliseconds)
     {
         if (interKeyDelayMilliseconds < 0)
             throw new ArgumentOutOfRangeException(nameof(interKeyDelayMilliseconds));
 
-        var regularStrokes = StrokeCount - AltGrStrokeCount;
+        var regularStrokes = StrokeCount - AltGrStrokeCount - ShiftStrokeCount;
         var milliseconds = checked(
             regularStrokes * TypingDurationEstimator.KeyHoldMilliseconds
+            + ShiftStrokeCount * TypingDurationEstimator.ShiftStrokeMilliseconds
             + AltGrStrokeCount * TypingDurationEstimator.AltGrStrokeMilliseconds
             + StrokeCount * interKeyDelayMilliseconds);
         return TimeSpan.FromTicks(checked(milliseconds * TimeSpan.TicksPerMillisecond));
@@ -20,7 +21,11 @@ public readonly record struct TypingWorkload(long StrokeCount, long AltGrStrokeC
 
 public static class TypingDurationEstimator
 {
-    public const int KeyHoldMilliseconds = 1;
+    // Mirrors firmware/include/board_config.h.
+    public const int KeyHoldMilliseconds = 10;
+    public const int ShiftSettleMilliseconds = 35;
+    public const int ShiftKeyHoldMilliseconds = 15;
+    public const int ShiftStrokeMilliseconds = ShiftSettleMilliseconds * 2 + ShiftKeyHoldMilliseconds;
     public const int AltGrSettleMilliseconds = 35;
     public const int AltGrKeyHoldMilliseconds = 15;
     public const int AltGrStrokeMilliseconds =
@@ -34,6 +39,7 @@ public static class TypingDurationEstimator
         ArgumentNullException.ThrowIfNull(text);
         long strokes = 0;
         long altGrStrokes = 0;
+        long shiftStrokes = 0;
 
         foreach (var rune in text.EnumerateRunes())
         {
@@ -44,10 +50,11 @@ public static class TypingDurationEstimator
             {
                 strokes++;
                 if ((stroke.Modifiers & GermanLayout.AltGr) != 0) altGrStrokes++;
+                else if (stroke.Modifiers != 0) shiftStrokes++;
             }
         }
 
-        return new TypingWorkload(strokes, altGrStrokes);
+        return new TypingWorkload(strokes, altGrStrokes, shiftStrokes);
     }
 
     public static string Format(TimeSpan duration)

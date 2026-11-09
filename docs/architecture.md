@@ -25,8 +25,11 @@ erhalten.
 TARGET und AFK staffeln echtes HID Right-Alt automatisch: Modifier-only, 35 ms
 Einschwingzeit, Modifier plus Taste, 15 ms Haltezeit, Taste loslassen, 35 ms und
 erst dann den Modifier loslassen. Das entspricht einem physischen AltGr-
-Tastendruck besser als ein gemeinsamer Ein-Millisekunden-Bericht. Andere
-Modifier behalten den schnellen normalen Ablauf.
+Tastendruck besser als ein gemeinsamer Bericht. Shift wird mit denselben Zeiten
+gestaffelt: Shift allein, 35 ms, Shift plus Taste, 15 ms halten, Taste
+loslassen, 35 ms, Shift loslassen. Mit nur 10 ms sahen VDI-Ziele noch
+gelegentlich die Taste ohne Shift (`9` statt `)`, `,` statt `;`). Tasten ohne
+Modifier werden 10 ms gehalten; kürzere Drücke gehen dort verloren.
 
 ## Datenfluss
 

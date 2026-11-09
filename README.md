@@ -193,7 +193,8 @@ der Ausgabe dauerhaft gespeichert. Die Auswahl bleibt nach dem Abziehen
 erhalten.
 
 Die Tippdauer in der GUI berücksichtigt pro HID-Tastenfolge die gewählte Pause,
-die Haltezeit und die längere gestaffelte Ausgabe von AltGr-Zeichen. Sie ist
+die Haltezeit von 10 ms und die gestaffelte Ausgabe von Shift- und AltGr-Zeichen
+(Modifier zuerst, dann die Taste, damit nicht `9` statt `)` ankommt). Sie ist
 eine sehr genaue Schätzung; Betriebssystem, USB-Weiterleitung und Zielprogramm
 können noch geringe zusätzliche Verzögerungen verursachen. Manuell mit V
 eingelegte Pausen zählen nicht zur Schätzung.
