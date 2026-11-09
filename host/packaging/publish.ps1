@@ -1,7 +1,8 @@
 param(
     [ValidateSet("win-x64", "linux-x64", "osx-x64", "osx-arm64")]
     [string[]]$RuntimeIdentifiers = @("win-x64", "linux-x64", "osx-x64", "osx-arm64"),
-    [switch]$SkipTests
+    [switch]$SkipTests,
+    [switch]$NoInstall
 )
 
 $ErrorActionPreference = "Stop"
@@ -86,3 +87,8 @@ foreach ($runtimeIdentifier in $RuntimeIdentifiers) {
 }
 
 Write-Output "CopyCop packages published under $releaseRoot"
+
+$runningOnWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
+if ($runningOnWindows -and ($RuntimeIdentifiers -contains "win-x64") -and -not $NoInstall) {
+    & (Join-Path $PSScriptRoot "install-windows.ps1")
+}
