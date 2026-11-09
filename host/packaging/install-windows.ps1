@@ -23,7 +23,7 @@ if ($running) {
 New-Item -ItemType Directory -Path $InstallDirectory -Force | Out-Null
 Copy-Item -LiteralPath $guiSource -Destination (Join-Path $InstallDirectory "CopyCop.exe") -Force
 Copy-Item -LiteralPath $cliSource -Destination (Join-Path $InstallDirectory "copycop-cli.exe") -Force
-foreach ($doc in "RELEASE-README.md", "THIRD-PARTY-NOTICES.md") {
+foreach ($doc in "RELEASE-README.md", "THIRD-PARTY-NOTICES.md", "copycop.html") {
     $docSource = Join-Path $SourceDirectory $doc
     if (Test-Path -LiteralPath $docSource) {
         Copy-Item -LiteralPath $docSource -Destination (Join-Path $InstallDirectory $doc) -Force
